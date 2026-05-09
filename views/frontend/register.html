@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | HostelPro</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="auth-shell">
+    <section class="auth-card">
+      <a class="brand" href="/"><span class="brand-mark">H</span><span>HostelPro</span></a>
+      <h1>Student registration</h1>
+      <p class="muted">Create a student account and apply for hostel accommodation.</p>
+      <form id="registerForm" class="form-grid">
+        <label>Name <input name="name" required placeholder="Full name"></label>
+        <label>Email <input name="email" type="email" required placeholder="student@example.com"></label>
+        <label>Password <input name="password" type="password" required minlength="6" placeholder="Minimum 6 characters"></label>
+        <label>Phone <input name="phone" placeholder="Phone number"></label>
+        <label>Department <input name="department" placeholder="Computer Science"></label>
+        <label>Year <input name="year" placeholder="3rd Year"></label>
+        <button class="btn primary" type="submit">Create Account</button>
+      </form>
+      <p class="muted">Already registered? <a href="/views/frontend/login.html">Login</a></p>
+    </section>
+  </main>
+  <div class="loader"><div class="spinner"></div></div>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | HostelPro</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="auth-shell">
+    <section class="auth-card">
+      <a class="brand" href="/"><span class="brand-mark">H</span><span>HostelPro</span></a>
+      <h1>Welcome back</h1>
+      <p class="muted">Login as a student or admin to continue.</p>
+      <form id="loginForm" class="form-grid">
+        <label>Email <input name="email" type="email" required placeholder="admin@hostel.com"></label>
+        <label>Password <input name="password" type="password" required minlength="6" placeholder="••••••••"></label>
+        <button class="btn primary" type="submit">Login</button>
+      </form>
+      <p class="muted">New student? <a href="/views/frontend/register.html">Create an account</a></p>
+    </section>
+  </main>
+  <div class="loader"><div class="spinner"></div></div>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+</body>
+</html>
