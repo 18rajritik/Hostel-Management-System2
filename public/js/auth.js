@@ -1,5 +1,10 @@
 const loginForm = document.querySelector("#loginForm");
 const registerForm = document.querySelector("#registerForm");
+const dashboardPath = (fileName) => {
+  return window.location.pathname.includes("/views/frontend/")
+    ? fileName
+    : `views/frontend/${fileName}`;
+};
 const demoAccounts = {
   admin: { email: "admin@hostel.com", password: "admin123" },
   student: { email: "aarav@student.com", password: "student123" }
@@ -16,7 +21,7 @@ if (loginForm) {
       });
       setSession(data.token, data.user);
       toast("Login successful");
-      window.location.href = data.user.role === "admin" ? "/views/frontend/admin-dashboard.html" : "/views/frontend/student-dashboard.html";
+      window.location.href = data.user.role === "admin" ? dashboardPath("admin-dashboard.html") : dashboardPath("student-dashboard.html");
     } catch (error) {
       toast(error.message, "error");
     }
@@ -44,7 +49,7 @@ if (registerForm) {
       });
       setSession(data.token, data.user);
       toast("Account created");
-      window.location.href = "/views/frontend/student-dashboard.html";
+      window.location.href = dashboardPath("student-dashboard.html");
     } catch (error) {
       toast(error.message, "error");
     }

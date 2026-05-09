@@ -24,9 +24,10 @@ app.use(morgan("dev"));
 
 // The HTML/CSS/JS frontend is served directly by Express.
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/public", express.static(path.join(__dirname, "public")));
 app.use("/views", express.static(path.join(__dirname, "views")));
 
-app.get("/", (req, res) => {
+app.get(["/", "/index.html"], (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 

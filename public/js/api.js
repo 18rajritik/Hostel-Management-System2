@@ -2,6 +2,11 @@ const API_BASE = "/api";
 
 const getToken = () => localStorage.getItem("hms_token");
 const getUser = () => JSON.parse(localStorage.getItem("hms_user") || "null");
+const viewPath = (fileName) => {
+  return window.location.pathname.includes("/views/frontend/")
+    ? fileName
+    : `views/frontend/${fileName}`;
+};
 
 const setSession = (token, user) => {
   localStorage.setItem("hms_token", token);
@@ -11,7 +16,7 @@ const setSession = (token, user) => {
 const logout = () => {
   localStorage.removeItem("hms_token");
   localStorage.removeItem("hms_user");
-  window.location.href = "/views/frontend/login.html";
+  window.location.href = viewPath("login.html");
 };
 
 const showLoader = (show) => {
@@ -52,7 +57,7 @@ const requireAuth = (role) => {
   const user = getUser();
   if (!getToken() || !user) logout();
   if (role && user.role !== role) {
-    window.location.href = user.role === "admin" ? "/views/frontend/admin-dashboard.html" : "/views/frontend/student-dashboard.html";
+    window.location.href = user.role === "admin" ? viewPath("admin-dashboard.html") : viewPath("student-dashboard.html");
   }
   return user;
 };
