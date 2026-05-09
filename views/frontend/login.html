@@ -8,15 +8,25 @@
 </head>
 <body>
   <main class="auth-shell">
+    <section class="auth-intro">
+      <span class="eyebrow">Admin and student access</span>
+      <h1>Manage rooms, dues, complaints, and students securely.</h1>
+      <p>One login page routes users to the correct dashboard after JWT authentication verifies their account role.</p>
+    </section>
+
     <section class="auth-card">
       <a class="brand" href="/"><span class="brand-mark">H</span><span>HostelPro</span></a>
       <h1>Welcome back</h1>
       <p class="muted">Login as a student or admin to continue.</p>
       <form id="loginForm" class="form-grid">
         <label>Email <input name="email" type="email" required placeholder="admin@hostel.com"></label>
-        <label>Password <input name="password" type="password" required minlength="6" placeholder="••••••••"></label>
+        <label>Password <input name="password" type="password" required minlength="6" placeholder="Minimum 6 characters"></label>
         <button class="btn primary" type="submit">Login</button>
       </form>
+      <div class="demo-strip">
+        <button class="btn ghost" type="button" data-demo="admin">Use Admin Demo</button>
+        <button class="btn ghost" type="button" data-demo="student">Use Student Demo</button>
+      </div>
       <p class="muted">New student? <a href="/views/frontend/register.html">Create an account</a></p>
     </section>
   </main>

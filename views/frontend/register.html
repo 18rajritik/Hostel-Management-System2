@@ -3,11 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register | HostelPro</title>
+  <title>Student Registration | HostelPro</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <main class="auth-shell">
+    <section class="auth-intro">
+      <span class="eyebrow">Student onboarding</span>
+      <h1>Create your hostel profile in a few details.</h1>
+      <p>After registration, students can submit room applications, update profile details, raise complaints, and view fee records from their dashboard.</p>
+    </section>
+
     <section class="auth-card">
       <a class="brand" href="/"><span class="brand-mark">H</span><span>HostelPro</span></a>
       <h1>Student registration</h1>
@@ -16,9 +22,11 @@
         <label>Name <input name="name" required placeholder="Full name"></label>
         <label>Email <input name="email" type="email" required placeholder="student@example.com"></label>
         <label>Password <input name="password" type="password" required minlength="6" placeholder="Minimum 6 characters"></label>
-        <label>Phone <input name="phone" placeholder="Phone number"></label>
+        <div class="form-grid two">
+          <label>Phone <input name="phone" placeholder="Phone number"></label>
+          <label>Year <input name="year" placeholder="3rd Year"></label>
+        </div>
         <label>Department <input name="department" placeholder="Computer Science"></label>
-        <label>Year <input name="year" placeholder="3rd Year"></label>
         <button class="btn primary" type="submit">Create Account</button>
       </form>
       <p class="muted">Already registered? <a href="/views/frontend/login.html">Login</a></p>

@@ -205,7 +205,7 @@ async function loadPayments() {
     <tr>
       <td>${item.student?.name || "-"}</td>
       <td>${item.term}</td>
-      <td>₹${item.amount.toLocaleString("en-IN")}</td>
+      <td>INR ${item.amount.toLocaleString("en-IN")}</td>
       <td>${new Date(item.dueDate).toLocaleDateString()}</td>
       <td>${badge(item.status)}</td>
       <td>

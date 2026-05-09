@@ -1,5 +1,9 @@
 const loginForm = document.querySelector("#loginForm");
 const registerForm = document.querySelector("#registerForm");
+const demoAccounts = {
+  admin: { email: "admin@hostel.com", password: "admin123" },
+  student: { email: "aarav@student.com", password: "student123" }
+};
 
 if (loginForm) {
   loginForm.addEventListener("submit", async (event) => {
@@ -18,6 +22,16 @@ if (loginForm) {
     }
   });
 }
+
+document.querySelectorAll("[data-demo]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const account = demoAccounts[button.dataset.demo];
+    if (!loginForm || !account) return;
+    loginForm.email.value = account.email;
+    loginForm.password.value = account.password;
+    toast(`${button.dataset.demo === "admin" ? "Admin" : "Student"} demo filled`);
+  });
+});
 
 if (registerForm) {
   registerForm.addEventListener("submit", async (event) => {

@@ -107,7 +107,7 @@ async function loadPayments() {
   const rows = data.data.map((item) => `
     <tr>
       <td>${item.term}</td>
-      <td>₹${item.amount.toLocaleString("en-IN")}</td>
+      <td>INR ${item.amount.toLocaleString("en-IN")}</td>
       <td>${new Date(item.dueDate).toLocaleDateString()}</td>
       <td>${badge(item.status)}</td>
       <td>${item.method}</td>
