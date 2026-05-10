@@ -28,6 +28,14 @@
             <strong>Quick demo access</strong>
             <button class="btn btn-ghost btn-small" id="prepare-demo-button" type="button">Prepare Demo Data</button>
           </div>
+          <div class="api-config-row">
+            <label class="api-config-field">
+              <span>Backend API URL</span>
+              <input id="api-base-input" type="text" placeholder="https://your-backend-domain/api" />
+            </label>
+            <button class="btn btn-ghost btn-small" id="save-api-base-button" type="button">Save</button>
+          </div>
+          <p id="api-status" class="demo-status"></p>
           <div class="quick-login-grid">
             <button class="quick-login-card" type="button" data-demo-role="admin">
               <span>Admin</span>

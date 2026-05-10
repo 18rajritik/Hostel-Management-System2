@@ -3,7 +3,19 @@ const configuredApiBase =
   document.documentElement.getAttribute("data-api-base") ||
   localStorage.getItem("hms_api_base");
 
-const API_BASE = configuredApiBase || `${window.location.origin}/api`;
+const normalizeApiBase = (value) => {
+  if (!value) return `${window.location.origin}/api`;
+  return value.replace(/\/+$/, "");
+};
+
+let API_BASE = normalizeApiBase(configuredApiBase);
+
+const setApiBase = (value) => {
+  const normalized = normalizeApiBase(value);
+  localStorage.setItem("hms_api_base", normalized);
+  API_BASE = normalized;
+  return normalized;
+};
 
 const getToken = () => localStorage.getItem("hms_token");
 const getUser = () => JSON.parse(localStorage.getItem("hms_user") || "null");
@@ -49,10 +61,15 @@ const apiFetch = async (path, options = {}) => {
 
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers
+    });
+  } catch (error) {
+    throw new Error("Backend API is unreachable. Check deployment, API URL, and server status.");
+  }
 
   const data = await response.json().catch(() => ({}));
 
@@ -61,6 +78,16 @@ const apiFetch = async (path, options = {}) => {
   }
 
   return data;
+};
+
+const checkApiHealth = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/health`);
+    if (!response.ok) throw new Error("Health check failed");
+    return { ok: true, apiBase: API_BASE };
+  } catch (error) {
+    return { ok: false, apiBase: API_BASE };
+  }
 };
 
 const createToastStack = () => {

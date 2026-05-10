@@ -4,6 +4,8 @@ if (getToken() && existingUser?.role) redirectForRole(existingUser.role);
 const roleQuery = new URLSearchParams(window.location.search).get("role");
 const demoStatus = document.getElementById("demo-status");
 const roleHint = document.getElementById("role-hint");
+const apiStatus = document.getElementById("api-status");
+const apiInput = document.getElementById("api-base-input");
 
 const roleCopy = {
   admin: {
@@ -27,9 +29,33 @@ const demoAccounts = {
   student: { email: "aarav@student.com", password: "student123" }
 };
 
+const setApiStatus = (message, type = "") => {
+  apiStatus.textContent = message;
+  apiStatus.dataset.state = type;
+};
+
 const setDemoStatus = (message, type = "") => {
   demoStatus.textContent = message;
   demoStatus.dataset.state = type;
+};
+
+const refreshApiHealth = async () => {
+  const result = await checkApiHealth();
+  apiInput.value = localStorage.getItem("hms_api_base") || "";
+
+  if (result.ok) {
+    setApiStatus(`Backend connected: ${result.apiBase}`, "success");
+  } else if (window.location.hostname.includes("github.io")) {
+    setApiStatus(
+      "This looks like a static GitHub Pages deployment. Logins need a real backend host or full-stack deployment.",
+      "error"
+    );
+  } else {
+    setApiStatus(
+      "Backend not reachable. Save a deployed API URL or redeploy the app with backend env variables.",
+      "error"
+    );
+  }
 };
 
 const prepareDemoData = async () => {
@@ -63,6 +89,12 @@ document.getElementById("prepare-demo-button").addEventListener("click", async (
   }
 });
 
+document.getElementById("save-api-base-button").addEventListener("click", async () => {
+  const value = apiInput.value.trim();
+  setApiBase(value || `${window.location.origin}/api`);
+  await refreshApiHealth();
+});
+
 document.querySelectorAll("[data-demo-role]").forEach((button) => {
   button.addEventListener("click", () => fillDemoLogin(button.dataset.demoRole));
 });
@@ -86,3 +118,5 @@ document.getElementById("login-form").addEventListener("submit", async (event) =
     errorNode.textContent = error.message;
   }
 });
+
+refreshApiHealth();
