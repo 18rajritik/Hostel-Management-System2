@@ -15,11 +15,11 @@ const clearSession = () => {
 
 const redirectForRole = (role) => {
   if (["admin", "warden"].includes(role)) {
-    window.location.replace("/admin-dashboard.html");
+    window.location.replace("./admin-dashboard.html");
   } else if (role === "student") {
-    window.location.replace("/student-dashboard.html");
+    window.location.replace("./student-dashboard.html");
   } else {
-    window.location.replace("/login.html");
+    window.location.replace("./login.html");
   }
 };
 
@@ -28,7 +28,7 @@ const requireRole = (allowedRoles) => {
   const user = getUser();
 
   if (!token || !user || !allowedRoles.includes(user.role)) {
-    window.location.replace("/login.html");
+    window.location.replace("./login.html");
     throw new Error("Unauthorized");
   }
 

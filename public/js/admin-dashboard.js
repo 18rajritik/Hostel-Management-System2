@@ -31,7 +31,7 @@ document.querySelectorAll(".nav-link").forEach((button) => {
 
 document.getElementById("logout-button").addEventListener("click", () => {
   clearSession();
-  window.location.replace("/login.html");
+  window.location.replace("./login.html");
 });
 
 const renderStudents = () => {

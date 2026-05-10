@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="./public/css/style.css" />
   </head>
   <body class="landing-body">
     <main class="landing-shell">
@@ -22,8 +22,8 @@
           hostel communication built for admins, wardens, and students.
         </p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="/login.html">Admin Login</a>
-          <a class="btn btn-secondary" href="/login.html">Student Login</a>
+          <a class="btn btn-primary" href="./public/login.html">Admin Login</a>
+          <a class="btn btn-secondary" href="./public/login.html">Student Login</a>
         </div>
       </section>
 
@@ -57,9 +57,9 @@
 
       if (token && user?.role) {
         if (["admin", "warden"].includes(user.role)) {
-          window.location.replace("/admin-dashboard.html");
+          window.location.replace("./public/admin-dashboard.html");
         } else if (user.role === "student") {
-          window.location.replace("/student-dashboard.html");
+          window.location.replace("./public/student-dashboard.html");
         }
       }
     </script>

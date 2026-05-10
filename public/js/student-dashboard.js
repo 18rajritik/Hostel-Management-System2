@@ -25,7 +25,7 @@ document.querySelectorAll(".nav-link").forEach((button) => {
 
 document.getElementById("student-logout").addEventListener("click", () => {
   clearSession();
-  window.location.replace("/login.html");
+  window.location.replace("./login.html");
 });
 
 const renderProfile = () => {
@@ -160,7 +160,7 @@ const loadStudentData = async () => {
     showToast(error.message, "error");
     if (error.message.includes("linked")) {
       clearSession();
-      setTimeout(() => window.location.replace("/login.html"), 1200);
+      setTimeout(() => window.location.replace("./login.html"), 1200);
     }
   } finally {
     setLoading("student-loader", false);
