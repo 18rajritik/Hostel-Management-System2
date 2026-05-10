@@ -84,11 +84,11 @@ const renderFees = () => {
     .map(
       (fee) => `
         <tr>
-          <td>${fee.month}</td>
-          <td>${formatCurrency(fee.amount)}</td>
-          <td>${fee.payment_mode}</td>
-          <td><span class="badge ${statusBadgeClass(fee.status)}">${fee.status}</span></td>
-          <td>${formatDate(fee.paid_date)}</td>
+          <td data-label="Month">${fee.month}</td>
+          <td data-label="Amount">${formatCurrency(fee.amount)}</td>
+          <td data-label="Payment Mode">${fee.payment_mode}</td>
+          <td data-label="Status"><span class="badge ${statusBadgeClass(fee.status)}">${fee.status}</span></td>
+          <td data-label="Paid Date">${formatDate(fee.paid_date)}</td>
         </tr>
       `
     )
@@ -111,10 +111,10 @@ const renderComplaints = () => {
     .map(
       (complaint) => `
         <tr>
-          <td>${complaint.title}</td>
-          <td>${complaint.category}</td>
-          <td><span class="badge ${statusBadgeClass(complaint.status)}">${complaint.status}</span></td>
-          <td>${formatDate(complaint.createdAt)}</td>
+          <td data-label="Title">${complaint.title}</td>
+          <td data-label="Category">${complaint.category}</td>
+          <td data-label="Status"><span class="badge ${statusBadgeClass(complaint.status)}">${complaint.status}</span></td>
+          <td data-label="Date Filed">${formatDate(complaint.createdAt)}</td>
         </tr>
       `
     )

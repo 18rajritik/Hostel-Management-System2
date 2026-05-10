@@ -11,6 +11,7 @@ const feeRoutes = require("./routes/feeRoutes");
 const complaintRoutes = require("./routes/complaintRoutes");
 const noticeRoutes = require("./routes/noticeRoutes");
 const studentSelfRoutes = require("./routes/studentSelfRoutes");
+const setupRoutes = require("./routes/setupRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
@@ -35,6 +36,7 @@ app.use("/api/fees", feeRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/notices", noticeRoutes);
 app.use("/api/student", studentSelfRoutes);
+app.use("/api/setup", setupRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({ success: true, message: "Server is running", timestamp: new Date() });

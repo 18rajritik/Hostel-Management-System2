@@ -43,14 +43,14 @@ const renderStudents = () => {
         : "Unassigned";
       return `
         <tr>
-          <td>${student.name}</td>
-          <td>${student.email}</td>
-          <td>${student.phone || "—"}</td>
-          <td>${student.course || "—"}</td>
-          <td>${student.year || "—"}</td>
-          <td>${room}</td>
-          <td><span class="badge ${statusBadgeClass(student.status)}">${student.status}</span></td>
-          <td>
+          <td data-label="Name">${student.name}</td>
+          <td data-label="Email">${student.email}</td>
+          <td data-label="Phone">${student.phone || "—"}</td>
+          <td data-label="Course">${student.course || "—"}</td>
+          <td data-label="Year">${student.year || "—"}</td>
+          <td data-label="Room">${room}</td>
+          <td data-label="Status"><span class="badge ${statusBadgeClass(student.status)}">${student.status}</span></td>
+          <td data-label="Action">
             <button class="table-action ${student.room_id ? "danger" : ""}" ${
               student.room_id ? `data-vacate="${student._id}"` : "disabled"
             }>
@@ -69,14 +69,14 @@ const renderRooms = () => {
     .map(
       (room) => `
         <tr>
-          <td>${room.room_number}</td>
-          <td>${room.block}</td>
-          <td>${room.floor}</td>
-          <td>${room.type}</td>
-          <td>${room.capacity}</td>
-          <td>${room.occupied}</td>
-          <td><span class="badge ${statusBadgeClass(room.status)}">${room.status}</span></td>
-          <td><button class="table-action danger" data-delete-room="${room._id}">Delete</button></td>
+          <td data-label="Room">${room.room_number}</td>
+          <td data-label="Block">${room.block}</td>
+          <td data-label="Floor">${room.floor}</td>
+          <td data-label="Type">${room.type}</td>
+          <td data-label="Capacity">${room.capacity}</td>
+          <td data-label="Occupied">${room.occupied}</td>
+          <td data-label="Status"><span class="badge ${statusBadgeClass(room.status)}">${room.status}</span></td>
+          <td data-label="Action"><button class="table-action danger" data-delete-room="${room._id}">Delete</button></td>
         </tr>
       `
     )
@@ -94,12 +94,12 @@ const renderFees = () => {
     .map(
       (fee) => `
         <tr>
-          <td>${fee.student_id?.name || "Unknown"}</td>
-          <td>${formatCurrency(fee.amount)}</td>
-          <td>${fee.month}</td>
-          <td>${fee.payment_mode}</td>
-          <td><span class="badge ${statusBadgeClass(fee.status)}">${fee.status}</span></td>
-          <td>${formatDate(fee.paid_date)}</td>
+          <td data-label="Student">${fee.student_id?.name || "Unknown"}</td>
+          <td data-label="Amount">${formatCurrency(fee.amount)}</td>
+          <td data-label="Month">${fee.month}</td>
+          <td data-label="Payment Mode">${fee.payment_mode}</td>
+          <td data-label="Status"><span class="badge ${statusBadgeClass(fee.status)}">${fee.status}</span></td>
+          <td data-label="Paid Date">${formatDate(fee.paid_date)}</td>
         </tr>
       `
     )
@@ -112,12 +112,12 @@ const renderComplaints = () => {
     .map(
       (complaint) => `
         <tr>
-          <td>${complaint.student_id?.name || "Unknown"}</td>
-          <td>${complaint.title}</td>
-          <td>${complaint.category}</td>
-          <td><span class="badge ${statusBadgeClass(complaint.status)}">${complaint.status}</span></td>
-          <td>${formatDate(complaint.createdAt)}</td>
-          <td>
+          <td data-label="Student">${complaint.student_id?.name || "Unknown"}</td>
+          <td data-label="Title">${complaint.title}</td>
+          <td data-label="Category">${complaint.category}</td>
+          <td data-label="Status"><span class="badge ${statusBadgeClass(complaint.status)}">${complaint.status}</span></td>
+          <td data-label="Date">${formatDate(complaint.createdAt)}</td>
+          <td data-label="Action">
             <button class="table-action" data-resolve="${complaint._id}" ${
               complaint.status === "resolved" ? "disabled" : ""
             }>
@@ -136,11 +136,11 @@ const renderNotices = () => {
     .map(
       (notice) => `
         <tr>
-          <td>${notice.title}</td>
-          <td><span class="badge ${statusBadgeClass(notice.category)}">${notice.category}</span></td>
-          <td>${notice.is_active ? "Yes" : "No"}</td>
-          <td>${formatDate(notice.createdAt)}</td>
-          <td><button class="table-action danger" data-delete-notice="${notice._id}">Delete</button></td>
+          <td data-label="Title">${notice.title}</td>
+          <td data-label="Category"><span class="badge ${statusBadgeClass(notice.category)}">${notice.category}</span></td>
+          <td data-label="Active">${notice.is_active ? "Yes" : "No"}</td>
+          <td data-label="Posted">${formatDate(notice.createdAt)}</td>
+          <td data-label="Action"><button class="table-action danger" data-delete-notice="${notice._id}">Delete</button></td>
         </tr>
       `
     )

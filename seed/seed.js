@@ -3,117 +3,120 @@ dotenv.config();
 
 const connectDB = require("../config/db");
 const User = require("../models/User");
+const Student = require("../models/Student");
 const Room = require("../models/Room");
-const Application = require("../models/Application");
 const Complaint = require("../models/Complaint");
-const Payment = require("../models/Payment");
+const Fee = require("../models/Fee");
+const Notice = require("../models/Notice");
 
 const seed = async () => {
   await connectDB();
 
-  await Promise.all([
-    User.deleteMany(),
-    Room.deleteMany(),
-    Application.deleteMany(),
-    Complaint.deleteMany(),
-    Payment.deleteMany()
-  ]);
+  await Promise.all([User.deleteMany(), Student.deleteMany(), Room.deleteMany(), Complaint.deleteMany(), Fee.deleteMany(), Notice.deleteMany()]);
 
   const admin = await User.create({
-    name: "Admin Officer",
+    username: "Admin Officer",
     email: "admin@hostel.com",
     password: "admin123",
-    role: "admin",
-    phone: "9000000001"
+    role: "admin"
   });
 
-  const students = await User.create([
+  const students = await Student.create([
     {
       name: "Aarav Sharma",
       email: "aarav@student.com",
-      password: "student123",
-      role: "student",
       phone: "9876500011",
-      department: "Computer Science",
+      course: "Computer Science",
       year: "3rd Year",
-      address: "Jaipur, Rajasthan",
-      guardianName: "Rakesh Sharma",
-      guardianPhone: "9876500012"
+      address: "Jaipur, Rajasthan"
     },
     {
       name: "Meera Nair",
       email: "meera@student.com",
+      phone: "9876500021",
+      course: "Electronics",
+      year: "2nd Year",
+      address: "Kochi, Kerala"
+    }
+  ]);
+
+  await User.create([
+    {
+      username: "Aarav Sharma",
+      email: "aarav@student.com",
       password: "student123",
       role: "student",
-      phone: "9876500021",
-      department: "Electronics",
-      year: "2nd Year",
-      address: "Kochi, Kerala",
-      guardianName: "Anita Nair",
-      guardianPhone: "9876500022"
+      student_id: students[0]._id
+    },
+    {
+      username: "Meera Nair",
+      email: "meera@student.com",
+      password: "student123",
+      role: "student",
+      student_id: students[1]._id
     }
   ]);
 
   const rooms = await Room.insertMany([
-    { roomNumber: "A-101", block: "A", floor: 1, capacity: 2, occupants: [students[0]._id], status: "available" },
-    { roomNumber: "A-102", block: "A", floor: 1, capacity: 2, occupants: [], status: "available" },
-    { roomNumber: "B-201", block: "B", floor: 2, capacity: 3, occupants: [students[1]._id], status: "available" },
-    { roomNumber: "C-301", block: "C", floor: 3, capacity: 1, occupants: [], status: "maintenance" }
+    { room_number: "A-101", block: "A", floor: 1, type: "double", capacity: 2, occupied: 1, status: "partial", amenities: ["WiFi", "Study Table"] },
+    { room_number: "A-102", block: "A", floor: 1, type: "double", capacity: 2, occupied: 0, status: "available", amenities: ["WiFi"] },
+    { room_number: "B-201", block: "B", floor: 2, type: "triple", capacity: 3, occupied: 1, status: "partial", amenities: ["WiFi", "Balcony"] },
+    { room_number: "C-301", block: "C", floor: 3, type: "single", capacity: 1, occupied: 0, status: "maintenance", amenities: ["Quiet Wing"] }
   ]);
 
-  await Application.insertMany([
-    {
-      student: students[0]._id,
-      preferredBlock: "A",
-      preferredFloor: 1,
-      notes: "Prefer quiet room for exam preparation.",
-      status: "Approved",
-      allottedRoom: rooms[0]._id
-    },
-    {
-      student: students[1]._id,
-      preferredBlock: "B",
-      preferredFloor: 2,
-      notes: "Need room near electronics lab side.",
-      status: "Pending"
-    }
-  ]);
+  students[0].room_id = rooms[0]._id;
+  students[1].room_id = rooms[2]._id;
+  await Promise.all(students.map((student) => student.save()));
 
   await Complaint.insertMany([
     {
-      student: students[0]._id,
+      student_id: students[0]._id,
       title: "Wi-Fi is unstable",
-      category: "Internet",
+      category: "other",
       description: "The connection drops during evening study hours.",
-      status: "In Progress",
-      adminNote: "Network vendor has been notified."
+      status: "in-progress"
     },
     {
-      student: students[1]._id,
+      student_id: students[1]._id,
       title: "Tube light not working",
-      category: "Maintenance",
+      category: "maintenance",
       description: "Room corridor light is flickering.",
-      status: "Pending"
+      status: "open"
     }
   ]);
 
-  await Payment.insertMany([
+  await Fee.insertMany([
     {
-      student: students[0]._id,
+      student_id: students[0]._id,
       amount: 45000,
-      term: "Semester 5",
-      dueDate: new Date("2026-07-10"),
-      paidDate: new Date("2026-05-01"),
-      status: "Paid",
-      method: "UPI"
+      month: "May 2026",
+      paid_date: new Date("2026-05-01"),
+      status: "paid",
+      payment_mode: "upi"
     },
     {
-      student: students[1]._id,
+      student_id: students[1]._id,
       amount: 45000,
-      term: "Semester 3",
-      dueDate: new Date("2026-07-10"),
-      status: "Pending",
-      method: "Pending"
+      month: "June 2026",
+      status: "pending",
+      payment_mode: "bank-transfer"
+    }
+  ]);
+
+  await Notice.insertMany([
+    {
+      title: "Welcome to the new session",
+      content: "Please complete your hostel verification at the office desk this week.",
+      category: "general",
+      posted_by: admin._id,
+      is_active: true
+    },
+    {
+      title: "Lights out reminder",
+      content: "Please maintain quiet hours from 10 PM onward.",
+      category: "rules",
+      posted_by: admin._id,
+      is_active: true
     }
   ]);
 

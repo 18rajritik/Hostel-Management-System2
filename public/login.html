@@ -19,14 +19,33 @@
     <main class="auth-shell">
       <section class="auth-copy">
         <div class="eyebrow">Secure hostel operations</div>
-        <h1>Welcome back to HMS</h1>
+        <h1 id="login-hero-title">Welcome back to HMS</h1>
         <p>
           Sign in to manage rooms, fees, notices, and student support from one elegant workspace.
         </p>
+        <div class="quick-login-panel">
+          <div class="quick-login-header">
+            <strong>Quick demo access</strong>
+            <button class="btn btn-ghost btn-small" id="prepare-demo-button" type="button">Prepare Demo Data</button>
+          </div>
+          <div class="quick-login-grid">
+            <button class="quick-login-card" type="button" data-demo-role="admin">
+              <span>Admin</span>
+              <strong>admin@hostel.com</strong>
+              <small>Use demo admin login</small>
+            </button>
+            <button class="quick-login-card" type="button" data-demo-role="student">
+              <span>Student</span>
+              <strong>aarav@student.com</strong>
+              <small>Use demo student login</small>
+            </button>
+          </div>
+          <p id="demo-status" class="demo-status"></p>
+        </div>
       </section>
 
       <section class="auth-card">
-        <h2>Login</h2>
+        <h2 id="login-card-title">Login</h2>
         <form id="login-form" class="stack-form">
           <label>
             <span>Email</span>
@@ -36,6 +55,7 @@
             <span>Password</span>
             <input type="password" name="password" placeholder="Enter password" required />
           </label>
+          <input type="hidden" name="role_hint" id="role-hint" />
           <button class="btn btn-primary btn-block" type="submit">Enter Dashboard</button>
           <p id="login-error" class="form-error"></p>
         </form>

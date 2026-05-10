@@ -1,4 +1,9 @@
-const API_BASE = "http://localhost:5000/api";
+const configuredApiBase =
+  window.HMS_API_BASE ||
+  document.documentElement.getAttribute("data-api-base") ||
+  localStorage.getItem("hms_api_base");
+
+const API_BASE = configuredApiBase || `${window.location.origin}/api`;
 
 const getToken = () => localStorage.getItem("hms_token");
 const getUser = () => JSON.parse(localStorage.getItem("hms_user") || "null");
