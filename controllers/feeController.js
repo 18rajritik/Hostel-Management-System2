@@ -1,11 +1,5 @@
 const Fee = require("../models/Fee");
 
-const baseQuery = () =>
-  Fee.find().populate({
-    path: "student_id",
-    populate: { path: "room_id" }
-  });
-
 const getFees = async (req, res, next) => {
   try {
     const filter = {};
@@ -13,7 +7,8 @@ const getFees = async (req, res, next) => {
 
     const fees = await Fee.find(filter)
       .populate("student_id")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json({ success: true, data: fees });
   } catch (error) {
@@ -25,7 +20,8 @@ const getPendingFees = async (req, res, next) => {
   try {
     const fees = await Fee.find({ status: { $in: ["pending", "overdue"] } })
       .populate("student_id")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json({ success: true, data: fees });
   } catch (error) {
@@ -46,7 +42,7 @@ const createFee = async (req, res, next) => {
     if (payload.status === "paid") payload.paid_date = req.body.paid_date || new Date();
 
     const fee = await Fee.create(payload);
-    const populated = await Fee.findById(fee._id).populate("student_id");
+    const populated = await Fee.findById(fee._id).populate("student_id").lean();
     res.status(201).json({ success: true, data: populated });
   } catch (error) {
     next(error);

@@ -4,7 +4,8 @@ const getAllNotices = async (req, res, next) => {
   try {
     const notices = await Notice.find()
       .populate("posted_by", "username email role")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json({ success: true, data: notices });
   } catch (error) {
@@ -16,7 +17,8 @@ const getActiveNotices = async (req, res, next) => {
   try {
     const notices = await Notice.find({ is_active: true })
       .populate("posted_by", "username")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json({ success: true, data: notices });
   } catch (error) {

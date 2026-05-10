@@ -2,7 +2,7 @@ const Room = require("../models/Room");
 
 const getRooms = async (req, res, next) => {
   try {
-    const rooms = await Room.find().sort({ block: 1, floor: 1, room_number: 1 });
+    const rooms = await Room.find().sort({ block: 1, floor: 1, room_number: 1 }).lean();
     res.json({ success: true, data: rooms });
   } catch (error) {
     next(error);
@@ -14,7 +14,9 @@ const getAvailableRooms = async (req, res, next) => {
     const rooms = await Room.find({
       status: { $ne: "maintenance" },
       $expr: { $lt: ["$occupied", "$capacity"] }
-    }).sort({ block: 1, floor: 1, room_number: 1 });
+    })
+      .sort({ block: 1, floor: 1, room_number: 1 })
+      .lean();
 
     res.json({ success: true, data: rooms });
   } catch (error) {

@@ -43,9 +43,15 @@ const renderAllocation = () => {
 
 const loadAllocationData = async () => {
   try {
-    const [studentsRes, roomsRes] = await Promise.all([apiFetch("/students"), apiFetch("/rooms/available")]);
-    allocationState.students = studentsRes.data || [];
-    allocationState.rooms = roomsRes.data || [];
+    if (isDemoMode()) {
+      const demoView = buildDemoAdminView();
+      allocationState.students = demoView.students || [];
+      allocationState.rooms = (demoView.rooms || []).filter((room) => room.occupied < room.capacity);
+    } else {
+      const [studentsRes, roomsRes] = await Promise.all([apiFetch("/students"), apiFetch("/rooms/available")]);
+      allocationState.students = studentsRes.data || [];
+      allocationState.rooms = roomsRes.data || [];
+    }
     renderAllocation();
   } catch (error) {
     showToast(error.message, "error");
@@ -75,10 +81,14 @@ document.addEventListener("click", async (event) => {
     if (!confirmed) return;
 
     try {
-      await apiFetch(`/students/${student._id}`, {
-        method: "PUT",
-        body: JSON.stringify({ room_id: room._id, status: "active" })
-      });
+      if (isDemoMode()) {
+        demoMutations.updateStudentRoom(student._id, room._id);
+      } else {
+        await apiFetch(`/students/${student._id}`, {
+          method: "PUT",
+          body: JSON.stringify({ room_id: room._id, status: "active" })
+        });
+      }
       showToast("Room allocated successfully.");
       allocationState.selectedStudentId = null;
       await loadAllocationData();

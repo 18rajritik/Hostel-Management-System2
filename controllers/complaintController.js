@@ -4,7 +4,8 @@ const getComplaints = async (req, res, next) => {
   try {
     const complaints = await Complaint.find()
       .populate("student_id")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json({ success: true, data: complaints });
   } catch (error) {
@@ -16,7 +17,8 @@ const getOpenComplaints = async (req, res, next) => {
   try {
     const complaints = await Complaint.find({ status: { $ne: "resolved" } })
       .populate("student_id")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json({ success: true, data: complaints });
   } catch (error) {

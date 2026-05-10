@@ -9,7 +9,7 @@ const getStudentProfile = async (req, res, next) => {
       throw new Error("No student profile linked to this account.");
     }
 
-    const student = await Student.findById(req.user.student_id).populate("room_id");
+    const student = await Student.findById(req.user.student_id).populate("room_id").lean();
     if (!student) {
       res.status(404);
       throw new Error("Student profile not found.");
@@ -28,7 +28,7 @@ const getStudentFees = async (req, res, next) => {
       throw new Error("No student profile linked to this account.");
     }
 
-    const fees = await Fee.find({ student_id: req.user.student_id }).sort({ createdAt: -1 });
+    const fees = await Fee.find({ student_id: req.user.student_id }).sort({ createdAt: -1 }).lean();
     res.json({ success: true, data: fees });
   } catch (error) {
     next(error);
@@ -42,7 +42,9 @@ const getStudentComplaints = async (req, res, next) => {
       throw new Error("No student profile linked to this account.");
     }
 
-    const complaints = await Complaint.find({ student_id: req.user.student_id }).sort({ createdAt: -1 });
+    const complaints = await Complaint.find({ student_id: req.user.student_id })
+      .sort({ createdAt: -1 })
+      .lean();
     res.json({ success: true, data: complaints });
   } catch (error) {
     next(error);

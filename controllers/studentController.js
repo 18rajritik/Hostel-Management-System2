@@ -23,7 +23,8 @@ const getStudents = async (req, res, next) => {
   try {
     const students = await Student.find()
       .populate("room_id")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json({ success: true, data: students });
   } catch (error) {
@@ -45,7 +46,7 @@ const createStudent = async (req, res, next) => {
 
     if (student.room_id) await syncRoomOccupancy(student.room_id);
 
-    const populated = await Student.findById(student._id).populate("room_id");
+    const populated = await Student.findById(student._id).populate("room_id").lean();
     res.status(201).json({ success: true, data: populated });
   } catch (error) {
     next(error);
@@ -95,7 +96,7 @@ const updateStudent = async (req, res, next) => {
     if (previousRoomId && previousRoomId !== nextRoomId) await syncRoomOccupancy(previousRoomId);
     if (nextRoomId) await syncRoomOccupancy(nextRoomId);
 
-    const updated = await Student.findById(student._id).populate("room_id");
+    const updated = await Student.findById(student._id).populate("room_id").lean();
     res.json({ success: true, data: updated });
   } catch (error) {
     next(error);
