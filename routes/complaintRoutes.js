@@ -1,27 +1,12 @@
 const express = require("express");
-const { body } = require("express-validator");
-const {
-  createComplaint,
-  listComplaints,
-  updateComplaint
-} = require("../controllers/complaintController");
-const { protect, authorize } = require("../middleware/authMiddleware");
-const validate = require("../middleware/validate");
+const { getComplaints, getOpenComplaints, resolveComplaint } = require("../controllers/complaintController");
+const { protect } = require("../middleware/authMiddleware");
+const { isWarden } = require("../middleware/roles");
 
 const router = express.Router();
 
-router.get("/", protect, listComplaints);
-router.post(
-  "/",
-  protect,
-  authorize("student"),
-  [
-    body("title").trim().notEmpty().withMessage("Title is required"),
-    body("description").trim().notEmpty().withMessage("Description is required")
-  ],
-  validate,
-  createComplaint
-);
-router.put("/:id", protect, authorize("admin"), updateComplaint);
+router.get("/", protect, isWarden, getComplaints);
+router.get("/open", protect, isWarden, getOpenComplaints);
+router.put("/:id/resolve", protect, isWarden, resolveComplaint);
 
 module.exports = router;

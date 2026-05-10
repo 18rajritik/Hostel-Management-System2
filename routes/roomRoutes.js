@@ -1,21 +1,34 @@
 const express = require("express");
 const { body } = require("express-validator");
-const { listRooms, createRoom, updateRoom, deleteRoom } = require("../controllers/roomController");
-const { protect, authorize } = require("../middleware/authMiddleware");
+const {
+  getRooms,
+  getAvailableRooms,
+  createRoom,
+  updateRoom,
+  deleteRoom
+} = require("../controllers/roomController");
+const { protect } = require("../middleware/authMiddleware");
+const { isWarden } = require("../middleware/roles");
 const validate = require("../middleware/validate");
 
 const router = express.Router();
 
-const roomValidation = [
-  body("roomNumber").trim().notEmpty().withMessage("Room number is required"),
-  body("block").trim().notEmpty().withMessage("Block is required"),
-  body("floor").isInt({ min: 0 }).withMessage("Floor must be a positive number"),
-  body("capacity").isInt({ min: 1 }).withMessage("Capacity must be at least 1")
-];
-
-router.get("/", protect, listRooms);
-router.post("/", protect, authorize("admin"), roomValidation, validate, createRoom);
-router.put("/:id", protect, authorize("admin"), updateRoom);
-router.delete("/:id", protect, authorize("admin"), deleteRoom);
+router.get("/", protect, getRooms);
+router.get("/available", protect, getAvailableRooms);
+router.post(
+  "/",
+  protect,
+  isWarden,
+  [
+    body("room_number").trim().notEmpty().withMessage("Room number is required"),
+    body("block").trim().notEmpty().withMessage("Block is required"),
+    body("floor").isNumeric().withMessage("Floor is required"),
+    body("capacity").isNumeric().withMessage("Capacity is required")
+  ],
+  validate,
+  createRoom
+);
+router.put("/:id", protect, isWarden, updateRoom);
+router.delete("/:id", protect, isWarden, deleteRoom);
 
 module.exports = router;

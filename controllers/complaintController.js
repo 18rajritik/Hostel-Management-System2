@@ -1,56 +1,36 @@
 const Complaint = require("../models/Complaint");
-const { getPagination, sendPaginated } = require("../utils/queryHelpers");
 
-const createComplaint = async (req, res, next) => {
+const getComplaints = async (req, res, next) => {
   try {
-    const complaint = await Complaint.create({
-      student: req.user._id,
-      title: req.body.title,
-      category: req.body.category,
-      description: req.body.description
-    });
-    res.status(201).json({ success: true, data: complaint });
+    const complaints = await Complaint.find()
+      .populate("student_id")
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, data: complaints });
   } catch (error) {
     next(error);
   }
 };
 
-const listComplaints = async (req, res, next) => {
+const getOpenComplaints = async (req, res, next) => {
   try {
-    const { page, limit, skip } = getPagination(req.query);
-    const search = req.query.search || "";
-    const filter = req.user.role === "admin" ? {} : { student: req.user._id };
-    if (req.query.status) filter.status = req.query.status;
-    if (search) {
-      filter.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { category: { $regex: search, $options: "i" } }
-      ];
-    }
+    const complaints = await Complaint.find({ status: { $ne: "resolved" } })
+      .populate("student_id")
+      .sort({ createdAt: -1 });
 
-    await sendPaginated(
-      res,
-      Complaint.find(filter)
-        .populate("student", "name email")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
-      Complaint.countDocuments(filter),
-      page,
-      limit
-    );
+    res.json({ success: true, data: complaints });
   } catch (error) {
     next(error);
   }
 };
 
-const updateComplaint = async (req, res, next) => {
+const resolveComplaint = async (req, res, next) => {
   try {
     const complaint = await Complaint.findByIdAndUpdate(
       req.params.id,
-      { status: req.body.status, adminNote: req.body.adminNote },
+      { status: "resolved" },
       { new: true, runValidators: true }
-    ).populate("student", "name email");
+    ).populate("student_id");
 
     if (!complaint) {
       res.status(404);
@@ -63,4 +43,4 @@ const updateComplaint = async (req, res, next) => {
   }
 };
 
-module.exports = { createComplaint, listComplaints, updateComplaint };
+module.exports = { getComplaints, getOpenComplaints, resolveComplaint };

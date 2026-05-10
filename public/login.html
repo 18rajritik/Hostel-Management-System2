@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HMS Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="login-body">
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <main class="auth-shell">
+      <section class="auth-copy">
+        <div class="eyebrow">Secure hostel operations</div>
+        <h1>Welcome back to HMS</h1>
+        <p>
+          Sign in to manage rooms, fees, notices, and student support from one elegant workspace.
+        </p>
+      </section>
+
+      <section class="auth-card">
+        <h2>Login</h2>
+        <form id="login-form" class="stack-form">
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" placeholder="admin@hostel.com" required />
+          </label>
+          <label>
+            <span>Password</span>
+            <input type="password" name="password" placeholder="Enter password" required />
+          </label>
+          <button class="btn btn-primary btn-block" type="submit">Enter Dashboard</button>
+          <p id="login-error" class="form-error"></p>
+        </form>
+      </section>
+    </main>
+
+    <script src="/js/hms-common.js"></script>
+    <script src="/js/login.js"></script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Room Allocation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="allocation-body">
+    <main class="allocation-shell">
+      <header class="allocation-topbar">
+        <div>
+          <div class="eyebrow">Smart room pairing</div>
+          <h1>Room Allocation</h1>
+          <p>Select a student, then select a room to allocate.</p>
+        </div>
+        <a class="btn btn-secondary" href="/admin-dashboard.html">Back to Dashboard</a>
+      </header>
+
+      <section class="allocation-grid">
+        <article class="allocation-panel">
+          <div class="section-head slim">
+            <div>
+              <h2>Unallocated Students</h2>
+              <p>Students waiting for room assignment.</p>
+            </div>
+          </div>
+          <div id="unallocated-students" class="card-list"></div>
+        </article>
+
+        <article class="allocation-panel">
+          <div class="section-head slim">
+            <div>
+              <h2>Available Rooms</h2>
+              <p>Rooms with free capacity ready for allocation.</p>
+            </div>
+          </div>
+          <div id="available-rooms" class="card-list"></div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/js/hms-common.js"></script>
+    <script src="/js/room-allocation.js"></script>
+  </body>
+</html>

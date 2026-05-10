@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HMS Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="dashboard-body">
+    <div class="dashboard-layout">
+      <aside class="sidebar sidebar-dark">
+        <div>
+          <div class="brand-lockup">
+            <div class="brand-icon">H</div>
+            <div>
+              <strong>Hostel HQ</strong>
+              <p>Admin control center</p>
+            </div>
+          </div>
+          <div class="user-chip">
+            <span id="admin-user-avatar">A</span>
+            <div>
+              <strong id="admin-user-name">Admin</strong>
+              <p id="admin-user-role">Administrator</p>
+            </div>
+          </div>
+          <nav class="sidebar-nav">
+            <button class="nav-link active" data-section="dashboard">Dashboard</button>
+            <button class="nav-link" data-section="students">Students</button>
+            <button class="nav-link" data-section="rooms">Rooms</button>
+            <button class="nav-link" data-section="fees">Fees</button>
+            <button class="nav-link" data-section="complaints">Complaints</button>
+            <button class="nav-link" data-section="notices">Notices</button>
+          </nav>
+        </div>
+
+        <div class="sidebar-actions">
+          <a class="btn btn-ghost" href="/room-allocation.html">Room Allocation</a>
+          <button class="btn btn-secondary" id="logout-button" type="button">Logout</button>
+        </div>
+      </aside>
+
+      <main class="dashboard-main">
+        <header class="page-topbar">
+          <div>
+            <div class="eyebrow">Hostel management overview</div>
+            <h1 id="section-title">Dashboard</h1>
+          </div>
+          <div id="global-loader" class="inline-loader hidden"></div>
+        </header>
+
+        <section id="dashboard" class="section-panel active">
+          <div class="stats-grid">
+            <article class="stat-card">
+              <p>Total Students</p>
+              <h2 id="stat-students">0</h2>
+            </article>
+            <article class="stat-card">
+              <p>Total Rooms</p>
+              <h2 id="stat-rooms">0</h2>
+            </article>
+            <article class="stat-card">
+              <p>Pending Fees</p>
+              <h2 id="stat-fees">0</h2>
+            </article>
+            <article class="stat-card">
+              <p>Open Complaints</p>
+              <h2 id="stat-complaints">0</h2>
+            </article>
+          </div>
+          <div class="split-highlight">
+            <article class="highlight-card">
+              <h3>Operations Snapshot</h3>
+              <p>
+                Stay on top of occupancy, revenue follow-ups, and student support with a single
+                clear dashboard.
+              </p>
+            </article>
+            <article class="highlight-card accent">
+              <h3>Next Best Action</h3>
+              <p id="dashboard-tip">Add rooms and students to start building your hostel map.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="students" class="section-panel">
+          <div class="section-head">
+            <div>
+              <h2>Students</h2>
+              <p>Manage hostel records and room assignments.</p>
+            </div>
+            <button class="btn btn-primary" data-modal="student-modal">Add Student</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Course</th>
+                  <th>Year</th>
+                  <th>Room</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="students-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="rooms" class="section-panel">
+          <div class="section-head">
+            <div>
+              <h2>Rooms</h2>
+              <p>Track availability, occupancy, and room details.</p>
+            </div>
+            <button class="btn btn-primary" data-modal="room-modal">Add Room</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Room</th>
+                  <th>Block</th>
+                  <th>Floor</th>
+                  <th>Type</th>
+                  <th>Capacity</th>
+                  <th>Occupied</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="rooms-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="fees" class="section-panel">
+          <div class="section-head">
+            <div>
+              <h2>Fees</h2>
+              <p>Monitor collection health across the hostel.</p>
+            </div>
+            <div class="cluster">
+              <div class="filter-group">
+                <button class="filter-btn active" data-fee-filter="all">All</button>
+                <button class="filter-btn" data-fee-filter="pending">Pending</button>
+                <button class="filter-btn" data-fee-filter="overdue">Overdue</button>
+              </div>
+              <button class="btn btn-primary" data-modal="fee-modal">Add Fee</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Amount</th>
+                  <th>Month</th>
+                  <th>Payment Mode</th>
+                  <th>Status</th>
+                  <th>Paid Date</th>
+                </tr>
+              </thead>
+              <tbody id="fees-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="complaints" class="section-panel">
+          <div class="section-head">
+            <div>
+              <h2>Complaints</h2>
+              <p>Resolve student issues with clear visibility.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="complaints-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="notices" class="section-panel">
+          <div class="section-head">
+            <div>
+              <h2>Notices</h2>
+              <p>Keep students informed with important announcements.</p>
+            </div>
+            <button class="btn btn-primary" data-modal="notice-modal">Add Notice</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Active</th>
+                  <th>Posted</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="notices-table"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="student-modal" class="modal hidden">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3>Add Student</h3>
+          <button class="icon-btn" data-close-modal>&times;</button>
+        </div>
+        <form id="student-form" class="grid-form">
+          <label><span>Name</span><input name="name" required /></label>
+          <label><span>Email</span><input name="email" type="email" required /></label>
+          <label><span>Phone</span><input name="phone" /></label>
+          <label><span>Course</span><input name="course" /></label>
+          <label><span>Year</span><input name="year" /></label>
+          <label class="full"><span>Address</span><textarea name="address"></textarea></label>
+          <button class="btn btn-primary full" type="submit">Save Student</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="room-modal" class="modal hidden">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3>Add Room</h3>
+          <button class="icon-btn" data-close-modal>&times;</button>
+        </div>
+        <form id="room-form" class="grid-form">
+          <label><span>Room Number</span><input name="room_number" required /></label>
+          <label><span>Block</span><input name="block" required /></label>
+          <label><span>Floor</span><input name="floor" type="number" required /></label>
+          <label>
+            <span>Type</span>
+            <select name="type">
+              <option value="single">Single</option>
+              <option value="double">Double</option>
+              <option value="triple">Triple</option>
+            </select>
+          </label>
+          <label><span>Capacity</span><input name="capacity" type="number" required /></label>
+          <label class="full"><span>Amenities</span><input name="amenities" placeholder="WiFi, Study Table, Balcony" /></label>
+          <button class="btn btn-primary full" type="submit">Create Room</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="fee-modal" class="modal hidden">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3>Add Fee</h3>
+          <button class="icon-btn" data-close-modal>&times;</button>
+        </div>
+        <form id="fee-form" class="grid-form">
+          <label class="full">
+            <span>Student</span>
+            <select name="student_id" id="fee-student-select" required></select>
+          </label>
+          <label><span>Amount</span><input name="amount" type="number" required /></label>
+          <label><span>Month</span><input name="month" placeholder="May 2026" required /></label>
+          <label>
+            <span>Payment Mode</span>
+            <select name="payment_mode">
+              <option value="cash">Cash</option>
+              <option value="upi">UPI</option>
+              <option value="card">Card</option>
+              <option value="bank-transfer">Bank Transfer</option>
+            </select>
+          </label>
+          <label>
+            <span>Status</span>
+            <select name="status">
+              <option value="pending">Pending</option>
+              <option value="overdue">Overdue</option>
+              <option value="paid">Paid</option>
+            </select>
+          </label>
+          <button class="btn btn-primary full" type="submit">Add Fee Record</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="notice-modal" class="modal hidden">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3>Create Notice</h3>
+          <button class="icon-btn" data-close-modal>&times;</button>
+        </div>
+        <form id="notice-form" class="grid-form">
+          <label class="full"><span>Title</span><input name="title" required /></label>
+          <label>
+            <span>Category</span>
+            <select name="category">
+              <option value="general">General</option>
+              <option value="fees">Fees</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="rules">Rules</option>
+            </select>
+          </label>
+          <label class="toggle-field">
+            <span>Active</span>
+            <input name="is_active" type="checkbox" checked />
+          </label>
+          <label class="full"><span>Content</span><textarea name="content" rows="5" required></textarea></label>
+          <button class="btn btn-primary full" type="submit">Publish Notice</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="/js/hms-common.js"></script>
+    <script src="/js/admin-dashboard.js"></script>
+  </body>
+</html>

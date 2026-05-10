@@ -9,9 +9,11 @@ const router = express.Router();
 router.post(
   "/register",
   [
-    body("name").trim().notEmpty().withMessage("Name is required"),
+    body("username").optional().trim().notEmpty().withMessage("Username cannot be empty"),
+    body("name").optional().trim().notEmpty().withMessage("Name cannot be empty"),
     body("email").isEmail().withMessage("Valid email is required"),
-    body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters")
+    body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters"),
+    body("role").optional().isIn(["admin", "warden", "student"]).withMessage("Invalid role")
   ],
   validate,
   register

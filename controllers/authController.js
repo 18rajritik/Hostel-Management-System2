@@ -1,43 +1,44 @@
-const { validationResult } = require("express-validator");
 const User = require("../models/User");
+const Student = require("../models/Student");
 const generateToken = require("../utils/generateToken");
 
-const sanitizeUser = (user) => ({
-  id: user._id,
-  name: user.name,
+const serializeUser = (user) => ({
+  _id: user._id,
+  username: user.username,
   email: user.email,
   role: user.role,
-  phone: user.phone,
-  department: user.department,
-  year: user.year,
-  address: user.address,
-  guardianName: user.guardianName,
-  guardianPhone: user.guardianPhone
+  student_id: user.student_id || null
 });
 
 const register = async (req, res, next) => {
   try {
-    const { name, email, password, phone, department, year } = req.body;
+    const { username, name, email, password, role = "student" } = req.body;
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
       res.status(409);
-      throw new Error("Email is already registered.");
+      throw new Error("User already exists.");
     }
 
-    const user = await User.create({
-      name,
+    const user = new User({
+      username: username || name,
       email,
       password,
-      phone,
-      department,
-      year,
-      role: "student"
+      role
     });
+
+    if (role === "student") {
+      const student = await Student.findOne({ email });
+      if (student) user.student_id = student._id;
+    }
+
+    await user.save();
 
     res.status(201).json({
       success: true,
+      message: "User registered successfully",
       token: generateToken(user._id, user.role),
-      user: sanitizeUser(user)
+      user: serializeUser(user)
     });
   } catch (error) {
     next(error);
@@ -49,15 +50,22 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select("+password");
 
-    if (!user || !(await user.matchPassword(password))) {
-      res.status(401);
-      throw new Error("Invalid email or password.");
+    if (!user) {
+      res.status(400);
+      throw new Error("User not found");
+    }
+
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      res.status(400);
+      throw new Error("Invalid password");
     }
 
     res.json({
       success: true,
+      message: "Login successful",
       token: generateToken(user._id, user.role),
-      user: sanitizeUser(user)
+      user: serializeUser(user)
     });
   } catch (error) {
     next(error);
@@ -65,7 +73,7 @@ const login = async (req, res, next) => {
 };
 
 const me = async (req, res) => {
-  res.json({ success: true, user: sanitizeUser(req.user) });
+  res.json({ success: true, user: serializeUser(req.user) });
 };
 
-module.exports = { register, login, me, sanitizeUser };
+module.exports = { register, login, me, serializeUser };

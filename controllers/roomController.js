@@ -1,26 +1,22 @@
 const Room = require("../models/Room");
-const { getPagination, sendPaginated } = require("../utils/queryHelpers");
 
-const listRooms = async (req, res, next) => {
+const getRooms = async (req, res, next) => {
   try {
-    const { page, limit, skip } = getPagination(req.query);
-    const search = req.query.search || "";
-    const status = req.query.status;
-    const filter = {
-      $or: [
-        { roomNumber: { $regex: search, $options: "i" } },
-        { block: { $regex: search, $options: "i" } }
-      ]
-    };
-    if (status) filter.status = status;
+    const rooms = await Room.find().sort({ block: 1, floor: 1, room_number: 1 });
+    res.json({ success: true, data: rooms });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    await sendPaginated(
-      res,
-      Room.find(filter).populate("occupants", "name email").sort({ block: 1, floor: 1, roomNumber: 1 }).skip(skip).limit(limit),
-      Room.countDocuments(filter),
-      page,
-      limit
-    );
+const getAvailableRooms = async (req, res, next) => {
+  try {
+    const rooms = await Room.find({
+      status: { $ne: "maintenance" },
+      $expr: { $lt: ["$occupied", "$capacity"] }
+    }).sort({ block: 1, floor: 1, room_number: 1 });
+
+    res.json({ success: true, data: rooms });
   } catch (error) {
     next(error);
   }
@@ -28,7 +24,22 @@ const listRooms = async (req, res, next) => {
 
 const createRoom = async (req, res, next) => {
   try {
-    const room = await Room.create(req.body);
+    const amenities = Array.isArray(req.body.amenities)
+      ? req.body.amenities
+      : String(req.body.amenities || "")
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean);
+
+    const room = await Room.create({
+      room_number: req.body.room_number,
+      floor: req.body.floor,
+      block: req.body.block,
+      capacity: req.body.capacity,
+      type: req.body.type,
+      amenities
+    });
+
     res.status(201).json({ success: true, data: room });
   } catch (error) {
     next(error);
@@ -37,14 +48,24 @@ const createRoom = async (req, res, next) => {
 
 const updateRoom = async (req, res, next) => {
   try {
-    const room = await Room.findByIdAndUpdate(req.params.id, req.body, {
+    const payload = { ...req.body };
+    if (payload.amenities !== undefined && !Array.isArray(payload.amenities)) {
+      payload.amenities = String(payload.amenities)
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    const room = await Room.findByIdAndUpdate(req.params.id, payload, {
       new: true,
       runValidators: true
     });
+
     if (!room) {
       res.status(404);
       throw new Error("Room not found.");
     }
+
     res.json({ success: true, data: room });
   } catch (error) {
     next(error);
@@ -53,15 +74,23 @@ const updateRoom = async (req, res, next) => {
 
 const deleteRoom = async (req, res, next) => {
   try {
-    const room = await Room.findByIdAndDelete(req.params.id);
+    const room = await Room.findById(req.params.id);
+
     if (!room) {
       res.status(404);
       throw new Error("Room not found.");
     }
+
+    if (room.occupied > 0) {
+      res.status(400);
+      throw new Error("Cannot delete a room that still has occupants.");
+    }
+
+    await room.deleteOne();
     res.json({ success: true, message: "Room deleted successfully." });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { listRooms, createRoom, updateRoom, deleteRoom };
+module.exports = { getRooms, getAvailableRooms, createRoom, updateRoom, deleteRoom };
