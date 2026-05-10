@@ -140,17 +140,25 @@ const renderNotices = () => {
 const loadStudentData = async () => {
   setLoading("student-loader", true);
   try {
-    const [profileRes, feesRes, complaintsRes, noticesRes] = await Promise.all([
-      apiFetch("/student/me"),
-      apiFetch("/student/me/fees"),
-      apiFetch("/student/me/complaints"),
-      apiFetch("/notices/active")
-    ]);
+    if (isDemoMode()) {
+      const demoView = buildDemoStudentView(studentUser.student_id || "stu-1");
+      studentState.profile = demoView.profile;
+      studentState.fees = demoView.fees;
+      studentState.complaints = demoView.complaints;
+      studentState.notices = demoView.notices;
+    } else {
+      const [profileRes, feesRes, complaintsRes, noticesRes] = await Promise.all([
+        apiFetch("/student/me"),
+        apiFetch("/student/me/fees"),
+        apiFetch("/student/me/complaints"),
+        apiFetch("/notices/active")
+      ]);
 
-    studentState.profile = profileRes.data;
-    studentState.fees = feesRes.data || [];
-    studentState.complaints = complaintsRes.data || [];
-    studentState.notices = noticesRes.data || [];
+      studentState.profile = profileRes.data;
+      studentState.fees = feesRes.data || [];
+      studentState.complaints = complaintsRes.data || [];
+      studentState.notices = noticesRes.data || [];
+    }
 
     renderProfile();
     renderFees();
@@ -170,10 +178,14 @@ const loadStudentData = async () => {
 document.getElementById("student-complaint-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   try {
-    await apiFetch("/student/me/complaints", {
-      method: "POST",
-      body: JSON.stringify(serializeForm(event.target))
-    });
+    const payload = serializeForm(event.target);
+    if (isDemoMode()) demoMutations.addStudentComplaint(studentUser.student_id || "stu-1", payload);
+    else {
+      await apiFetch("/student/me/complaints", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    }
     closeModal("student-complaint-modal");
     event.target.reset();
     showToast("Complaint submitted successfully.");

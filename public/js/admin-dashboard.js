@@ -172,19 +172,28 @@ const renderStats = () => {
 const loadAllData = async () => {
   setLoading("global-loader", true);
   try {
-    const [students, rooms, fees, complaints, notices] = await Promise.all([
-      apiFetch("/students"),
-      apiFetch("/rooms"),
-      apiFetch("/fees"),
-      apiFetch("/complaints"),
-      apiFetch("/notices")
-    ]);
+    if (isDemoMode()) {
+      const demoView = buildDemoAdminView();
+      adminState.students = demoView.students;
+      adminState.rooms = demoView.rooms;
+      adminState.fees = demoView.fees;
+      adminState.complaints = demoView.complaints;
+      adminState.notices = demoView.notices;
+    } else {
+      const [students, rooms, fees, complaints, notices] = await Promise.all([
+        apiFetch("/students"),
+        apiFetch("/rooms"),
+        apiFetch("/fees"),
+        apiFetch("/complaints"),
+        apiFetch("/notices")
+      ]);
 
-    adminState.students = students.data || [];
-    adminState.rooms = rooms.data || [];
-    adminState.fees = fees.data || [];
-    adminState.complaints = complaints.data || [];
-    adminState.notices = notices.data || [];
+      adminState.students = students.data || [];
+      adminState.rooms = rooms.data || [];
+      adminState.fees = fees.data || [];
+      adminState.complaints = complaints.data || [];
+      adminState.notices = notices.data || [];
+    }
 
     renderStudents();
     renderRooms();
@@ -202,10 +211,14 @@ const loadAllData = async () => {
 document.getElementById("student-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   try {
-    await apiFetch("/students", {
-      method: "POST",
-      body: JSON.stringify(serializeForm(event.target))
-    });
+    const payload = serializeForm(event.target);
+    if (isDemoMode()) demoMutations.addStudent(payload);
+    else {
+      await apiFetch("/students", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    }
     closeModal("student-modal");
     event.target.reset();
     showToast("Student created successfully.");
@@ -221,10 +234,13 @@ document.getElementById("room-form").addEventListener("submit", async (event) =>
   payload.floor = Number(payload.floor);
   payload.capacity = Number(payload.capacity);
   try {
-    await apiFetch("/rooms", {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
+    if (isDemoMode()) demoMutations.addRoom(payload);
+    else {
+      await apiFetch("/rooms", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    }
     closeModal("room-modal");
     event.target.reset();
     showToast("Room added successfully.");
@@ -239,10 +255,13 @@ document.getElementById("fee-form").addEventListener("submit", async (event) => 
   const payload = serializeForm(event.target);
   payload.amount = Number(payload.amount);
   try {
-    await apiFetch("/fees", {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
+    if (isDemoMode()) demoMutations.addFee(payload);
+    else {
+      await apiFetch("/fees", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    }
     closeModal("fee-modal");
     event.target.reset();
     showToast("Fee record created.");
@@ -257,10 +276,13 @@ document.getElementById("notice-form").addEventListener("submit", async (event) 
   const payload = serializeForm(event.target);
   payload.is_active = event.target.is_active.checked;
   try {
-    await apiFetch("/notices", {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
+    if (isDemoMode()) demoMutations.addNotice(payload);
+    else {
+      await apiFetch("/notices", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    }
     closeModal("notice-modal");
     event.target.reset();
     event.target.is_active.checked = true;
@@ -279,25 +301,29 @@ document.addEventListener("click", async (event) => {
 
   try {
     if (vacateId) {
-      await apiFetch(`/students/${vacateId}/vacate`, { method: "PUT" });
+      if (isDemoMode()) demoMutations.vacateStudent(vacateId);
+      else await apiFetch(`/students/${vacateId}/vacate`, { method: "PUT" });
       showToast("Student vacated successfully.");
       await loadAllData();
     }
 
     if (deleteRoomId) {
-      await apiFetch(`/rooms/${deleteRoomId}`, { method: "DELETE" });
+      if (isDemoMode()) demoMutations.deleteRoom(deleteRoomId);
+      else await apiFetch(`/rooms/${deleteRoomId}`, { method: "DELETE" });
       showToast("Room deleted.");
       await loadAllData();
     }
 
     if (resolveId) {
-      await apiFetch(`/complaints/${resolveId}/resolve`, { method: "PUT" });
+      if (isDemoMode()) demoMutations.resolveComplaint(resolveId);
+      else await apiFetch(`/complaints/${resolveId}/resolve`, { method: "PUT" });
       showToast("Complaint resolved.");
       await loadAllData();
     }
 
     if (deleteNoticeId) {
-      await apiFetch(`/notices/${deleteNoticeId}`, { method: "DELETE" });
+      if (isDemoMode()) demoMutations.deleteNotice(deleteNoticeId);
+      else await apiFetch(`/notices/${deleteNoticeId}`, { method: "DELETE" });
       showToast("Notice deleted.");
       await loadAllData();
     }

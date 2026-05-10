@@ -60,10 +60,16 @@ const refreshApiHealth = async () => {
 
 const prepareDemoData = async () => {
   setDemoStatus("Preparing demo accounts...");
-  const response = await apiFetch("/setup/bootstrap-demo", { method: "POST" });
-  Object.assign(demoAccounts, response.credentials || {});
-  setDemoStatus("Demo data is ready. You can use admin or student quick login.", "success");
-  return response;
+  try {
+    const response = await apiFetch("/setup/bootstrap-demo", { method: "POST" });
+    Object.assign(demoAccounts, response.credentials || {});
+    setDemoStatus("Demo data is ready. You can use admin or student quick login.", "success");
+    return response;
+  } catch (error) {
+    ensureDemoData();
+    setDemoStatus("Backend unavailable, so local demo mode is ready instead.", "success");
+    return { credentials: demoAccounts };
+  }
 };
 
 const fillDemoLogin = async (role) => {
@@ -103,9 +109,9 @@ document.getElementById("login-form").addEventListener("submit", async (event) =
   event.preventDefault();
   const errorNode = document.getElementById("login-error");
   errorNode.textContent = "";
+  const payload = serializeForm(event.target);
 
   try {
-    const payload = serializeForm(event.target);
     delete payload.role_hint;
     const response = await apiFetch("/auth/login", {
       method: "POST",
@@ -115,6 +121,21 @@ document.getElementById("login-form").addEventListener("submit", async (event) =
     setSession(response.token, response.user);
     redirectForRole(response.user.role);
   } catch (error) {
+    const matchedRole =
+      payload.email === demoAccounts.admin.email && payload.password === demoAccounts.admin.password
+        ? "admin"
+        : payload.email === demoAccounts.student.email && payload.password === demoAccounts.student.password
+          ? "student"
+          : null;
+
+    if (matchedRole) {
+      ensureDemoData();
+      demoLogin(matchedRole);
+      setDemoStatus("Logged in with local demo mode because the backend is unavailable.", "success");
+      redirectForRole(matchedRole);
+      return;
+    }
+
     errorNode.textContent = error.message;
   }
 });
