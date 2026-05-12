@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HMS Sign Up</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body class="login-body">
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <main class="auth-shell">
+      <section class="auth-copy">
+        <div class="eyebrow">Secure hostel operations</div>
+        <h1 id="signup-hero-title">Create Your Account</h1>
+        <p id="signup-hero-desc">
+          Join our hostel management system to access your room, fees, complaints, and notices all in one place.
+        </p>
+      </section>
+
+      <section class="auth-card">
+        <h2 id="signup-card-title">Sign Up</h2>
+        <form id="signup-form" class="stack-form">
+          <label>
+            <span>Full Name</span>
+            <input type="text" name="name" placeholder="Enter your full name" required />
+          </label>
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" placeholder="you@example.com" required />
+          </label>
+          <label>
+            <span>Username</span>
+            <input type="text" name="username" placeholder="Choose a username" required />
+          </label>
+          <label>
+            <span>Password</span>
+            <input type="password" name="password" placeholder="At least 6 characters" required />
+          </label>
+          <input type="hidden" name="role" id="role-input" />
+          <button class="btn btn-primary btn-block" type="submit">Create Account</button>
+          <p id="signup-error" class="form-error"></p>
+        </form>
+        
+        <div class="signup-section">
+          <p class="signup-divider">Already have an account?</p>
+          <a class="btn btn-secondary btn-block" href="./login.html">Back to Login</a>
+        </div>
+      </section>
+    </main>
+
+    <script src="./js/hms-common.js"></script>
+    <script src="./js/signup.js"></script>
+  </body>
+</html>
