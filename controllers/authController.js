@@ -2,6 +2,18 @@ const User = require("../models/User");
 const Student = require("../models/Student");
 const generateToken = require("../utils/generateToken");
 
+const parseAllowList = (value) =>
+  String(value || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const extractClientIp = (req) => {
+  const forwardedFor = req.headers["x-forwarded-for"];
+  if (forwardedFor) return String(forwardedFor).split(",")[0].trim();
+  return req.ip || req.socket?.remoteAddress || "";
+};
+
 const serializeUser = (user) => ({
   _id: user._id,
   username: user.username,
@@ -54,7 +66,7 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, adminLoginKey } = req.body;
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
@@ -66,6 +78,28 @@ const login = async (req, res, next) => {
     if (!isPasswordValid) {
       res.status(400);
       throw new Error("Invalid password");
+    }
+
+    if (user.role === "admin") {
+      const requiredAdminKey = process.env.ADMIN_LOGIN_KEY;
+      if (requiredAdminKey && adminLoginKey !== requiredAdminKey) {
+        res.status(403);
+        throw new Error("Admin security key is invalid.");
+      }
+
+      const allowedOrigins = parseAllowList(process.env.ADMIN_ALLOWED_ORIGINS);
+      const requestOrigin = req.get("origin") || "";
+      if (allowedOrigins.length > 0 && requestOrigin && !allowedOrigins.includes(requestOrigin)) {
+        res.status(403);
+        throw new Error("Admin login blocked from this origin.");
+      }
+
+      const allowedIps = parseAllowList(process.env.ADMIN_ALLOWED_IPS);
+      const clientIp = extractClientIp(req);
+      if (allowedIps.length > 0 && !allowedIps.includes(clientIp)) {
+        res.status(403);
+        throw new Error("Admin login blocked from this IP.");
+      }
     }
 
     if (user.role === "student" && !user.isApproved) {
@@ -110,4 +144,18 @@ const me = async (req, res) => {
   res.json({ success: true, user: serializeUser(req.user) });
 };
 
-module.exports = { register, login, forgotPassword, me, serializeUser };
+const adminProfile = async (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      _id: req.user._id,
+      username: req.user.username,
+      email: req.user.email,
+      role: req.user.role,
+      createdAt: req.user.createdAt,
+      updatedAt: req.user.updatedAt
+    }
+  });
+};
+
+module.exports = { register, login, forgotPassword, me, adminProfile, serializeUser };

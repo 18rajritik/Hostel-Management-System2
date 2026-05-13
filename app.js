@@ -15,6 +15,7 @@ const setupRoutes = require("./routes/setupRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
+app.set("trust proxy", true);
 
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
