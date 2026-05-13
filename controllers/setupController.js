@@ -142,4 +142,82 @@ const bootstrapDemoData = async (req, res, next) => {
   }
 };
 
-module.exports = { bootstrapDemoData };
+const buildRoomCodes = () => {
+  const ranges = [
+    [1, 7],
+    [101, 120],
+    [201, 220],
+    [301, 320]
+  ];
+
+  const roomCodes = [];
+  ranges.forEach(([start, end]) => {
+    for (let value = start; value <= end; value += 1) {
+      roomCodes.push(String(value).padStart(3, "0"));
+    }
+  });
+
+  return roomCodes;
+};
+
+const getFloorFromCode = (code) => {
+  if (code.startsWith("3")) return 3;
+  if (code.startsWith("2")) return 2;
+  if (code.startsWith("1")) return 1;
+  return 0;
+};
+
+const createDefaultUnits = async (req, res, next) => {
+  try {
+    const units = [
+      { prefix: "U1", block: "Unit-1" },
+      { prefix: "U2", block: "Unit-2" }
+    ];
+    const roomCodes = buildRoomCodes();
+    const amenities = ["WiFi", "Study Table"];
+
+    const operations = [];
+    units.forEach((unit) => {
+      roomCodes.forEach((code) => {
+        operations.push({
+          updateOne: {
+            filter: { room_number: `${unit.prefix}-${code}` },
+            update: {
+              $setOnInsert: {
+                room_number: `${unit.prefix}-${code}`,
+                block: unit.block,
+                floor: getFloorFromCode(code),
+                type: "double",
+                capacity: 2,
+                occupied: 0,
+                status: "available",
+                amenities
+              }
+            },
+            upsert: true
+          }
+        });
+      });
+    });
+
+    const result = await Room.bulkWrite(operations, { ordered: false });
+    const perUnitRooms = roomCodes.length;
+
+    res.json({
+      success: true,
+      message: "Default units created/verified successfully.",
+      data: {
+        unitCount: units.length,
+        roomsPerUnit: perUnitRooms,
+        totalPlannedRooms: units.length * perUnitRooms,
+        createdRooms: result.upsertedCount || 0,
+        existingRooms: units.length * perUnitRooms - (result.upsertedCount || 0),
+        capacityPerRoom: 2
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { bootstrapDemoData, createDefaultUnits };
