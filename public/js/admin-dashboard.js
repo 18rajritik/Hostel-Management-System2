@@ -34,6 +34,38 @@ document.getElementById("logout-button").addEventListener("click", () => {
   window.location.replace("./login.html");
 });
 
+const getFeeConfigForApproval = () => {
+  const unitInput = window
+    .prompt("Enter unit for this student fee (Unit-1 or Unit-2):", "Unit-1")
+    ?.trim();
+  if (!unitInput) return null;
+  const normalizedUnit = unitInput.toLowerCase();
+  if (!["unit-1", "unit-2"].includes(normalizedUnit)) {
+    showToast("Invalid unit. Use Unit-1 or Unit-2.", "error");
+    return null;
+  }
+
+  const mealInput = window.prompt("Enter meal type (veg or non-veg):", "veg")?.trim().toLowerCase();
+  if (!mealInput) return null;
+  if (!["veg", "non-veg"].includes(mealInput)) {
+    showToast("Invalid meal type. Use veg or non-veg.", "error");
+    return null;
+  }
+
+  const modeInput = window.prompt("Enter payment mode (cash or upi):", "cash")?.trim().toLowerCase();
+  if (!modeInput) return null;
+  if (!["cash", "upi"].includes(modeInput)) {
+    showToast("Invalid payment mode. Use cash or upi.", "error");
+    return null;
+  }
+
+  return {
+    unit: normalizedUnit === "unit-1" ? "Unit-1" : "Unit-2",
+    meal_type: mealInput,
+    payment_mode: modeInput
+  };
+};
+
 const renderStudents = () => {
   const tbody = document.getElementById("students-table");
   tbody.innerHTML = adminState.students
@@ -364,9 +396,15 @@ document.addEventListener("click", async (event) => {
         return;
       }
       const nextApproved = approvedState !== "true";
+      const payload = { approved: nextApproved };
+      if (nextApproved) {
+        const feeConfig = getFeeConfigForApproval();
+        if (!feeConfig) return;
+        Object.assign(payload, feeConfig);
+      }
       await apiFetch(`/students/${toggleAccessId}/access`, {
         method: "PUT",
-        body: JSON.stringify({ approved: nextApproved })
+        body: JSON.stringify(payload)
       });
       showToast(nextApproved ? "Student access approved." : "Student access revoked.");
       await loadAllData();
@@ -377,9 +415,11 @@ document.addEventListener("click", async (event) => {
         showToast("Access approval is only available with live backend.", "error");
         return;
       }
+      const feeConfig = getFeeConfigForApproval();
+      if (!feeConfig) return;
       await apiFetch(`/students/${quickApproveId}/access`, {
         method: "PUT",
-        body: JSON.stringify({ approved: true })
+        body: JSON.stringify({ approved: true, ...feeConfig })
       });
       showToast("Student access approved.");
       await loadAllData();

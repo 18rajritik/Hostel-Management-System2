@@ -1,6 +1,12 @@
 const Student = require("../models/Student");
 const Room = require("../models/Room");
 const User = require("../models/User");
+const Fee = require("../models/Fee");
+
+const FEE_BY_MEAL_TYPE = {
+  veg: 79000,
+  "non-veg": 89000
+};
 
 const syncRoomOccupancy = async (roomId) => {
   if (!roomId) return null;
@@ -152,6 +158,45 @@ const updateStudentAccess = async (req, res, next) => {
     user.isApproved = approved;
     student.status = approved ? "active" : "pending";
 
+    let feeRecord = null;
+    if (approved) {
+      const unit = String(req.body.unit || "").trim();
+      const mealType = String(req.body.meal_type || "").trim().toLowerCase();
+      const paymentMode = String(req.body.payment_mode || "").trim().toLowerCase();
+
+      if (!["unit-1", "unit-2"].includes(unit.toLowerCase())) {
+        res.status(400);
+        throw new Error("Unit is required (Unit-1 or Unit-2) while approving student access.");
+      }
+
+      if (!Object.keys(FEE_BY_MEAL_TYPE).includes(mealType)) {
+        res.status(400);
+        throw new Error("Meal type is required (veg or non-veg) while approving student access.");
+      }
+
+      if (!["cash", "upi"].includes(paymentMode)) {
+        res.status(400);
+        throw new Error("Payment mode must be cash or upi while approving student access.");
+      }
+
+      const amount = FEE_BY_MEAL_TYPE[mealType];
+      const now = new Date();
+      const monthLabel = now.toLocaleString("en-IN", { month: "long", year: "numeric" });
+
+      feeRecord = await Fee.findOneAndUpdate(
+        { student_id: student._id, month: monthLabel },
+        {
+          student_id: student._id,
+          amount,
+          month: monthLabel,
+          payment_mode: paymentMode,
+          status: "paid",
+          paid_date: now
+        },
+        { upsert: true, new: true, runValidators: true }
+      );
+    }
+
     await Promise.all([user.save(), student.save()]);
 
     res.json({
@@ -160,7 +205,8 @@ const updateStudentAccess = async (req, res, next) => {
       data: {
         student_id: student._id,
         accessApproved: user.isApproved,
-        status: student.status
+        status: student.status,
+        fee: feeRecord
       }
     });
   } catch (error) {
