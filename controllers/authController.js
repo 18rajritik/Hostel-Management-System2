@@ -8,10 +8,36 @@ const parseAllowList = (value) =>
     .map((item) => item.trim())
     .filter(Boolean);
 
+const normalizeIp = (value) => {
+  let ip = String(value || "").trim();
+  if (!ip) return "";
+
+  // Strip port for values like "1.2.3.4:5678"
+  if (ip.includes(":") && ip.includes(".") && ip.split(":").length === 2) {
+    ip = ip.split(":")[0];
+  }
+
+  // Normalize IPv4-mapped IPv6 e.g. "::ffff:1.2.3.4"
+  if (ip.startsWith("::ffff:")) {
+    ip = ip.slice(7);
+  }
+
+  if (ip === "::1") return "127.0.0.1";
+  return ip;
+};
+
 const extractClientIp = (req) => {
   const forwardedFor = req.headers["x-forwarded-for"];
-  if (forwardedFor) return String(forwardedFor).split(",")[0].trim();
-  return req.ip || req.socket?.remoteAddress || "";
+  if (forwardedFor) return normalizeIp(String(forwardedFor).split(",")[0].trim());
+  return normalizeIp(req.ip || req.socket?.remoteAddress || "");
+};
+
+const isIpAllowed = (allowedIps, clientIp) => {
+  if (allowedIps.length === 0) return true;
+  const normalizedClientIp = normalizeIp(clientIp);
+  const normalizedAllowedIps = allowedIps.map(normalizeIp);
+  if (normalizedAllowedIps.includes("*")) return true;
+  return normalizedAllowedIps.includes(normalizedClientIp);
 };
 
 const serializeUser = (user) => ({
@@ -96,7 +122,7 @@ const login = async (req, res, next) => {
 
       const allowedIps = parseAllowList(process.env.ADMIN_ALLOWED_IPS);
       const clientIp = extractClientIp(req);
-      if (allowedIps.length > 0 && !allowedIps.includes(clientIp)) {
+      if (!isIpAllowed(allowedIps, clientIp)) {
         res.status(403);
         throw new Error("Admin login blocked from this IP.");
       }
