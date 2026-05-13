@@ -7,8 +7,8 @@ const validate = require("../middleware/validate");
 
 const router = express.Router();
 
-router.get("/", protect, getFees);
-router.get("/pending", protect, getPendingFees);
+router.get("/", protect, isWarden, getFees);
+router.get("/pending", protect, isWarden, getPendingFees);
 router.post(
   "/",
   protect,

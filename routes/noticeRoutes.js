@@ -14,7 +14,7 @@ const validate = require("../middleware/validate");
 const router = express.Router();
 
 router.get("/", protect, isWarden, getAllNotices);
-router.get("/active", getActiveNotices);
+router.get("/active", protect, getActiveNotices);
 router.post(
   "/",
   protect,
