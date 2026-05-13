@@ -331,6 +331,23 @@ document.getElementById("notice-form").addEventListener("submit", async (event) 
   }
 });
 
+document.getElementById("generate-default-rooms-button")?.addEventListener("click", async () => {
+  try {
+    if (isDemoMode()) {
+      showToast("Default room generation is only available with live backend.", "error");
+      return;
+    }
+
+    await apiFetch("/setup/create-default-units", {
+      method: "POST"
+    });
+    showToast("Default Unit-1 and Unit-2 rooms generated.");
+    await loadAllData();
+  } catch (error) {
+    showToast(error.message, "error");
+  }
+});
+
 document.addEventListener("click", async (event) => {
   const vacateId = event.target.getAttribute("data-vacate");
   const quickApproveId = event.target.getAttribute("data-approve-access");
