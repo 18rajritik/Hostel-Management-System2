@@ -177,6 +177,35 @@ const renderStats = () => {
     .join("");
 };
 
+const renderPendingAccess = () => {
+  const pending = adminState.students.filter((student) => !student.accessApproved);
+  const countNode = document.getElementById("pending-access-count");
+  const listNode = document.getElementById("pending-access-list");
+  const hintNode = document.getElementById("pending-access-hint");
+
+  if (!countNode || !listNode || !hintNode) return;
+
+  countNode.textContent = pending.length;
+  if (!pending.length) {
+    hintNode.textContent = "No pending student approvals right now.";
+    listNode.innerHTML = "";
+    return;
+  }
+
+  hintNode.textContent = "Approve these students so they can log in.";
+  listNode.innerHTML = pending
+    .map(
+      (student) => `
+        <div class="selection-card">
+          <h4>${student.name}</h4>
+          <p>${student.email}</p>
+          <button class="btn btn-primary btn-small" data-approve-access="${student._id}">Approve Access</button>
+        </div>
+      `
+    )
+    .join("");
+};
+
 const loadAllData = async () => {
   setLoading("global-loader", true);
   try {
@@ -209,6 +238,7 @@ const loadAllData = async () => {
     renderComplaints();
     renderNotices();
     renderStats();
+    renderPendingAccess();
   } catch (error) {
     showToast(error.message, "error");
   } finally {
@@ -303,6 +333,7 @@ document.getElementById("notice-form").addEventListener("submit", async (event) 
 
 document.addEventListener("click", async (event) => {
   const vacateId = event.target.getAttribute("data-vacate");
+  const quickApproveId = event.target.getAttribute("data-approve-access");
   const toggleAccessId = event.target.getAttribute("data-toggle-access");
   const approvedState = event.target.getAttribute("data-approved");
   const deleteRoomId = event.target.getAttribute("data-delete-room");
@@ -321,6 +352,19 @@ document.addEventListener("click", async (event) => {
         body: JSON.stringify({ approved: nextApproved })
       });
       showToast(nextApproved ? "Student access approved." : "Student access revoked.");
+      await loadAllData();
+    }
+
+    if (quickApproveId) {
+      if (isDemoMode()) {
+        showToast("Access approval is only available with live backend.", "error");
+        return;
+      }
+      await apiFetch(`/students/${quickApproveId}/access`, {
+        method: "PUT",
+        body: JSON.stringify({ approved: true })
+      });
+      showToast("Student access approved.");
       await loadAllData();
     }
 

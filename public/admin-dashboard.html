@@ -93,9 +93,14 @@
           <div class="section-head">
             <div>
               <h2>Students</h2>
-              <p>Manage hostel records and room assignments.</p>
+              <p>Manage hostel records, room assignments, and login access approvals.</p>
             </div>
             <button class="btn btn-primary" data-modal="student-modal">Add Student</button>
+          </div>
+          <div class="highlight-card" style="margin-top: 1rem;">
+            <h3>Pending Access Requests: <span id="pending-access-count">0</span></h3>
+            <p id="pending-access-hint">Approve student accounts here before they can log in.</p>
+            <div id="pending-access-list" class="card-list"></div>
           </div>
           <div class="table-wrap">
             <table>
