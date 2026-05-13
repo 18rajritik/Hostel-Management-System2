@@ -376,6 +376,25 @@ button {
   font-size: 0.92rem;
 }
 
+.helper-note {
+  margin: 0 0 1rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.inline-link-wrap {
+  margin: 0;
+  text-align: center;
+}
+
+.inline-link {
+  color: #9de5c8;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .signup-section {
   margin-top: 1.5rem;
   padding-top: 1.5rem;

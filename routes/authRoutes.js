@@ -1,6 +1,6 @@
 const express = require("express");
 const { body } = require("express-validator");
-const { register, login, me } = require("../controllers/authController");
+const { register, login, forgotPassword, me } = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 const validate = require("../middleware/validate");
 
@@ -26,6 +26,16 @@ router.post(
   ],
   validate,
   login
+);
+
+router.post(
+  "/forgot-password",
+  [
+    body("email").isEmail().withMessage("Valid email is required"),
+    body("newPassword").isLength({ min: 6 }).withMessage("New password must be at least 6 characters")
+  ],
+  validate,
+  forgotPassword
 );
 
 router.get("/me", protect, me);

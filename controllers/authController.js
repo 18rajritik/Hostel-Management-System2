@@ -84,8 +84,30 @@ const login = async (req, res, next) => {
   }
 };
 
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email, newPassword } = req.body;
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user) {
+      res.status(404);
+      throw new Error("No account found with this email.");
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Password reset successful. Please log in with your new password."
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const me = async (req, res) => {
   res.json({ success: true, user: serializeUser(req.user) });
 };
 
-module.exports = { register, login, me, serializeUser };
+module.exports = { register, login, forgotPassword, me, serializeUser };
