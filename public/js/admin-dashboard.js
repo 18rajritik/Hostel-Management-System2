@@ -50,7 +50,15 @@ const renderStudents = () => {
           <td data-label="Year">${student.year || "—"}</td>
           <td data-label="Room">${room}</td>
           <td data-label="Status"><span class="badge ${statusBadgeClass(student.status)}">${student.status}</span></td>
+          <td data-label="Access">
+            <span class="badge ${student.accessApproved ? "green" : "orange"}">
+              ${student.accessApproved ? "approved" : "pending"}
+            </span>
+          </td>
           <td data-label="Action">
+            <button class="table-action ${student.accessApproved ? "danger" : ""}" data-toggle-access="${student._id}" data-approved="${student.accessApproved ? "true" : "false"}">
+              ${student.accessApproved ? "Revoke Access" : "Approve Access"}
+            </button>
             <button class="table-action ${student.room_id ? "danger" : ""}" ${
               student.room_id ? `data-vacate="${student._id}"` : "disabled"
             }>
@@ -295,11 +303,27 @@ document.getElementById("notice-form").addEventListener("submit", async (event) 
 
 document.addEventListener("click", async (event) => {
   const vacateId = event.target.getAttribute("data-vacate");
+  const toggleAccessId = event.target.getAttribute("data-toggle-access");
+  const approvedState = event.target.getAttribute("data-approved");
   const deleteRoomId = event.target.getAttribute("data-delete-room");
   const resolveId = event.target.getAttribute("data-resolve");
   const deleteNoticeId = event.target.getAttribute("data-delete-notice");
 
   try {
+    if (toggleAccessId) {
+      if (isDemoMode()) {
+        showToast("Access approval is only available with live backend.", "error");
+        return;
+      }
+      const nextApproved = approvedState !== "true";
+      await apiFetch(`/students/${toggleAccessId}/access`, {
+        method: "PUT",
+        body: JSON.stringify({ approved: nextApproved })
+      });
+      showToast(nextApproved ? "Student access approved." : "Student access revoked.");
+      await loadAllData();
+    }
+
     if (vacateId) {
       if (isDemoMode()) demoMutations.vacateStudent(vacateId);
       else await apiFetch(`/students/${vacateId}/vacate`, { method: "PUT" });

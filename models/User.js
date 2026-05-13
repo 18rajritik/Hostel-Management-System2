@@ -26,6 +26,12 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "warden", "student"],
       default: "student"
     },
+    isApproved: {
+      type: Boolean,
+      default: function defaultApproval() {
+        return this.role !== "student";
+      }
+    },
     student_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Student",

@@ -7,12 +7,13 @@ const serializeUser = (user) => ({
   username: user.username,
   email: user.email,
   role: user.role,
+  isApproved: user.role === "student" ? Boolean(user.isApproved) : true,
   student_id: user.student_id || null
 });
 
 const register = async (req, res, next) => {
   try {
-    const { username, name, email, password, role = "student" } = req.body;
+    const { username, name, email, password } = req.body;
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -20,23 +21,29 @@ const register = async (req, res, next) => {
       throw new Error("User already exists.");
     }
 
+    let student = await Student.findOne({ email });
+    if (!student) {
+      student = await Student.create({
+        name: name || username || email.split("@")[0],
+        email,
+        status: "pending"
+      });
+    }
+
     const user = new User({
       username: username || name,
       email,
       password,
-      role
+      role: "student",
+      isApproved: false,
+      student_id: student._id
     });
-
-    if (role === "student") {
-      const student = await Student.findOne({ email });
-      if (student) user.student_id = student._id;
-    }
 
     await user.save();
 
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
+      message: "Registration successful. Your account is pending admin approval.",
       token: generateToken(user._id, user.role),
       user: serializeUser(user)
     });
@@ -59,6 +66,11 @@ const login = async (req, res, next) => {
     if (!isPasswordValid) {
       res.status(400);
       throw new Error("Invalid password");
+    }
+
+    if (user.role === "student" && !user.isApproved) {
+      res.status(403);
+      throw new Error("Admin has not approved your account yet.");
     }
 
     res.json({

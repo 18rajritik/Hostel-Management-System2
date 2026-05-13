@@ -6,14 +6,9 @@ const roleInput = document.getElementById("role-input");
 const errorNode = document.getElementById("signup-error");
 
 const roleCopy = {
-  admin: {
-    hero: "Create an Admin Account",
-    desc: "Set up your admin profile to manage the entire hostel operation.",
-    card: "Admin Sign Up"
-  },
   student: {
     hero: "Create Your Student Account",
-    desc: "Join our hostel management system to access your room, fees, complaints, and notices.",
+    desc: "Create your student account. Admin approval is required before you can log in.",
     card: "Student Sign Up"
   }
 };
@@ -32,23 +27,21 @@ document.getElementById("signup-form").addEventListener("submit", async (event) 
   errorNode.textContent = "";
 
   const payload = serializeForm(event.target);
-  const role = payload.role || "student";
 
   try {
-    const response = await apiFetch("/auth/register", {
+    await apiFetch("/auth/register", {
       method: "POST",
       body: JSON.stringify({
         name: payload.name,
         email: payload.email,
         username: payload.username,
-        password: payload.password,
-        role: role
+        password: payload.password
       })
     });
 
-    setSession(response.token, response.user);
-    showToast("Account created successfully!", "success");
-    redirectForRole(response.user.role);
+    localStorage.setItem("hms_signup_notice", "Registration submitted. Wait for admin approval before login.");
+    showToast("Registration submitted. Wait for admin approval.", "success");
+    window.location.replace("./login.html");
   } catch (error) {
     errorNode.textContent = error.message || "Sign up failed. Please try again.";
   }

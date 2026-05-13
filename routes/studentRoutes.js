@@ -4,7 +4,8 @@ const {
   getStudents,
   createStudent,
   updateStudent,
-  vacateStudent
+  vacateStudent,
+  updateStudentAccess
 } = require("../controllers/studentController");
 const { protect } = require("../middleware/authMiddleware");
 const { isWarden } = require("../middleware/roles");
@@ -26,5 +27,13 @@ router.post(
 );
 router.put("/:id", protect, isWarden, updateStudent);
 router.put("/:id/vacate", protect, isWarden, vacateStudent);
+router.put(
+  "/:id/access",
+  protect,
+  isWarden,
+  [body("approved").isBoolean().withMessage("approved must be true or false")],
+  validate,
+  updateStudentAccess
+);
 
 module.exports = router;

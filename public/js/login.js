@@ -39,6 +39,12 @@ const setDemoStatus = (message, type = "") => {
   demoStatus.dataset.state = type;
 };
 
+const pendingNotice = localStorage.getItem("hms_signup_notice");
+if (pendingNotice) {
+  setDemoStatus(pendingNotice, "success");
+  localStorage.removeItem("hms_signup_notice");
+}
+
 const refreshApiHealth = async () => {
   const result = await checkApiHealth();
   apiInput.value = localStorage.getItem("hms_api_base") || "";

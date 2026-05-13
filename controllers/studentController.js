@@ -1,5 +1,6 @@
 const Student = require("../models/Student");
 const Room = require("../models/Room");
+const User = require("../models/User");
 
 const syncRoomOccupancy = async (roomId) => {
   if (!roomId) return null;
@@ -25,8 +26,17 @@ const getStudents = async (req, res, next) => {
       .populate("room_id")
       .sort({ createdAt: -1 })
       .lean();
+    const studentIds = students.map((student) => student._id);
+    const users = await User.find({ role: "student", student_id: { $in: studentIds } })
+      .select("student_id isApproved")
+      .lean();
+    const accessByStudentId = new Map(users.map((user) => [String(user.student_id), Boolean(user.isApproved)]));
+    const enriched = students.map((student) => ({
+      ...student,
+      accessApproved: accessByStudentId.get(String(student._id)) || false
+    }));
 
-    res.json({ success: true, data: students });
+    res.json({ success: true, data: enriched });
   } catch (error) {
     next(error);
   }
@@ -124,10 +134,45 @@ const vacateStudent = async (req, res, next) => {
   }
 };
 
+const updateStudentAccess = async (req, res, next) => {
+  try {
+    const student = await Student.findById(req.params.id);
+    if (!student) {
+      res.status(404);
+      throw new Error("Student not found.");
+    }
+
+    const user = await User.findOne({ role: "student", student_id: student._id });
+    if (!user) {
+      res.status(404);
+      throw new Error("Student login account not found for this profile.");
+    }
+
+    const approved = Boolean(req.body.approved);
+    user.isApproved = approved;
+    student.status = approved ? "active" : "pending";
+
+    await Promise.all([user.save(), student.save()]);
+
+    res.json({
+      success: true,
+      message: approved ? "Student access approved." : "Student access revoked.",
+      data: {
+        student_id: student._id,
+        accessApproved: user.isApproved,
+        status: student.status
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getStudents,
   createStudent,
   updateStudent,
   vacateStudent,
+  updateStudentAccess,
   syncRoomOccupancy
 };
