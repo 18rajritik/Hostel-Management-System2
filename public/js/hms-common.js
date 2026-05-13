@@ -9,6 +9,7 @@ const normalizeApiBase = (value) => {
 };
 
 let API_BASE = normalizeApiBase(configuredApiBase);
+const DEFAULT_API_BASE = normalizeApiBase(`${window.location.origin}/api`);
 
 const setApiBase = (value) => {
   const normalized = normalizeApiBase(value);
@@ -378,14 +379,27 @@ const apiFetch = async (path, options = {}) => {
 
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  let response;
-  try {
-    response = await fetch(`${API_BASE}${path}`, {
+  const executeFetch = () =>
+    fetch(`${API_BASE}${path}`, {
       ...options,
       headers
     });
+
+  let response;
+  try {
+    response = await executeFetch();
   } catch (error) {
-    throw new Error("Backend API is unreachable. Check deployment, API URL, and server status.");
+    if (API_BASE !== DEFAULT_API_BASE) {
+      API_BASE = DEFAULT_API_BASE;
+      localStorage.removeItem("hms_api_base");
+      try {
+        response = await executeFetch();
+      } catch (retryError) {
+        throw new Error("Backend API is unreachable. Check deployment, API URL, and server status.");
+      }
+    } else {
+      throw new Error("Backend API is unreachable. Check deployment, API URL, and server status.");
+    }
   }
 
   const data = await response.json().catch(() => ({}));
