@@ -3,7 +3,14 @@ requireRole(["admin", "warden"]);
 const allocationState = {
   students: [],
   rooms: [],
-  selectedStudentId: null
+  selectedStudentId: null,
+  roomFilter: "available"
+};
+
+const getRoomFilterStatus = (room) => {
+  if (room.occupied >= room.capacity) return "occupied";
+  if (room.occupied > 0) return "partial";
+  return "available";
 };
 
 const renderAllocation = () => {
@@ -11,6 +18,9 @@ const renderAllocation = () => {
   const roomWrap = document.getElementById("available-rooms");
 
   const unallocated = allocationState.students.filter((student) => !student.room_id);
+  const filteredRooms = allocationState.rooms.filter(
+    (room) => getRoomFilterStatus(room) === allocationState.roomFilter
+  );
 
   studentWrap.innerHTML = unallocated.length
     ? unallocated
@@ -18,7 +28,7 @@ const renderAllocation = () => {
           (student) => `
             <button class="selection-card ${allocationState.selectedStudentId === student._id ? "selected" : ""}" data-student-card="${student._id}">
               <h3>${student.name}</h3>
-              <p>${student.course || "Course not set"} â€¢ ${student.year || "Year not set"}</p>
+              <p>${student.course || "Course not set"} • ${student.year || "Year not set"}</p>
               <p>${student.email}</p>
             </button>
           `
@@ -26,19 +36,20 @@ const renderAllocation = () => {
         .join("")
     : `<div class="empty-state">All students are currently allocated.</div>`;
 
-  roomWrap.innerHTML = allocationState.rooms.length
-    ? allocationState.rooms
-        .map(
-          (room) => `
-            <button class="selection-card room-available" data-room-card="${room._id}">
+  roomWrap.innerHTML = filteredRooms.length
+    ? filteredRooms
+        .map((room) => {
+          const roomStatus = getRoomFilterStatus(room);
+          return `
+            <button class="selection-card ${roomStatus === "occupied" ? "room-full" : "room-available"}" data-room-card="${room._id}">
               <h4>Room ${room.room_number}</h4>
-              <p>${room.block} Block â€¢ Floor ${room.floor}</p>
-              <p>${room.type} â€¢ ${room.occupied}/${room.capacity} occupied</p>
+              <p>${room.block} Block • Floor ${room.floor}</p>
+              <p>${room.type} • ${room.occupied}/${room.capacity} occupied • ${roomStatus}</p>
             </button>
-          `
-        )
+          `;
+        })
         .join("")
-    : `<div class="empty-state">No available rooms right now.</div>`;
+    : `<div class="empty-state">No rooms in ${allocationState.roomFilter} status right now.</div>`;
 };
 
 const loadAllocationData = async () => {
@@ -46,9 +57,9 @@ const loadAllocationData = async () => {
     if (isDemoMode()) {
       const demoView = buildDemoAdminView();
       allocationState.students = demoView.students || [];
-      allocationState.rooms = (demoView.rooms || []).filter((room) => room.occupied < room.capacity);
+      allocationState.rooms = demoView.rooms || [];
     } else {
-      const [studentsRes, roomsRes] = await Promise.all([apiFetch("/students"), apiFetch("/rooms/available")]);
+      const [studentsRes, roomsRes] = await Promise.all([apiFetch("/students"), apiFetch("/rooms")]);
       allocationState.students = studentsRes.data || [];
       allocationState.rooms = roomsRes.data || [];
     }
@@ -77,6 +88,11 @@ document.addEventListener("click", async (event) => {
     const student = allocationState.students.find((item) => item._id === allocationState.selectedStudentId);
     const room = allocationState.rooms.find((item) => item._id === roomId);
 
+    if (!room || room.occupied >= room.capacity) {
+      showToast("This room is already fully occupied.", "error");
+      return;
+    }
+
     const confirmed = window.confirm(`Allocate ${student.name} to Room ${room.room_number}?`);
     if (!confirmed) return;
 
@@ -96,6 +112,15 @@ document.addEventListener("click", async (event) => {
       showToast(error.message, "error");
     }
   }
+});
+
+document.querySelectorAll("[data-room-filter]").forEach((button) => {
+  button.addEventListener("click", () => {
+    allocationState.roomFilter = button.dataset.roomFilter;
+    document.querySelectorAll("[data-room-filter]").forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+    renderAllocation();
+  });
 });
 
 loadAllocationData();

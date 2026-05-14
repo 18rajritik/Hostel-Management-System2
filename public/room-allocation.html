@@ -37,8 +37,13 @@
         <article class="allocation-panel">
           <div class="section-head slim">
             <div>
-              <h2>Available Rooms</h2>
-              <p>Rooms with free capacity ready for allocation.</p>
+              <h2>Rooms</h2>
+              <p>Filter by room occupancy status.</p>
+            </div>
+            <div class="filter-group" id="room-status-filter">
+              <button class="filter-btn active" data-room-filter="available" type="button">Available</button>
+              <button class="filter-btn" data-room-filter="partial" type="button">Partial</button>
+              <button class="filter-btn" data-room-filter="occupied" type="button">Occupied</button>
             </div>
           </div>
           <div id="available-rooms" class="card-list"></div>
