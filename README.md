@@ -81,9 +81,9 @@ cp .env.example .env
 
 ```env
 PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/hostel_management
-JWT_SECRET=change_this_to_a_long_random_secret
-JWT_EXPIRES_IN=7d
+MONGO_URI=mongodb://gjygjugb
+JWT_SECRET=change_this_to_bhvbhjbjma
+JWT_EXPIRES_IN=pp
 ```
 
 4. Install dependencies:
