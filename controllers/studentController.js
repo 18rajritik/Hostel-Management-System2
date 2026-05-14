@@ -2,6 +2,7 @@ const Student = require("../models/Student");
 const Room = require("../models/Room");
 const User = require("../models/User");
 const Fee = require("../models/Fee");
+const Complaint = require("../models/Complaint");
 
 const FEE_BY_MEAL_TYPE = {
   veg: 79000,
@@ -141,6 +142,39 @@ const vacateStudent = async (req, res, next) => {
   }
 };
 
+const deleteStudent = async (req, res, next) => {
+  try {
+    const student = await Student.findById(req.params.id);
+    if (!student) {
+      res.status(404);
+      throw new Error("Student not found.");
+    }
+
+    const user = await User.findOne({ role: "student", student_id: student._id });
+    const accessApproved = user ? Boolean(user.isApproved) : false;
+
+    if (student.status !== "vacated" && accessApproved) {
+      res.status(400);
+      throw new Error("Only vacated or not-approved students can be deleted.");
+    }
+
+    const previousRoomId = student.room_id ? String(student.room_id) : null;
+
+    await Promise.all([
+      Student.deleteOne({ _id: student._id }),
+      User.deleteMany({ role: "student", student_id: student._id }),
+      Fee.deleteMany({ student_id: student._id }),
+      Complaint.deleteMany({ student_id: student._id })
+    ]);
+
+    if (previousRoomId) await syncRoomOccupancy(previousRoomId);
+
+    res.json({ success: true, message: "Student and related records deleted successfully." });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const updateStudentAccess = async (req, res, next) => {
   try {
     const student = await Student.findById(req.params.id);
@@ -220,6 +254,7 @@ module.exports = {
   createStudent,
   updateStudent,
   vacateStudent,
+  deleteStudent,
   updateStudentAccess,
   syncRoomOccupancy
 };

@@ -73,6 +73,7 @@ const renderStudents = () => {
       const room = student.room_id
         ? `${student.room_id.room_number} / ${student.room_id.block}`
         : "Unassigned";
+      const canDelete = student.status === "vacated" || !student.accessApproved;
       return `
         <tr>
           <td data-label="Name">${student.name}</td>
@@ -95,6 +96,9 @@ const renderStudents = () => {
               student.room_id ? `data-vacate="${student._id}"` : "disabled"
             }>
               Vacate
+            </button>
+            <button class="table-action danger" ${canDelete ? `data-delete-student="${student._id}"` : "disabled"}>
+              Delete
             </button>
           </td>
         </tr>
@@ -232,6 +236,7 @@ const renderPendingAccess = () => {
           <h4>${student.name}</h4>
           <p>${student.email}</p>
           <button class="btn btn-primary btn-small" data-approve-access="${student._id}">Approve Access</button>
+          <button class="btn btn-secondary btn-small" data-delete-student="${student._id}" style="margin-top: 0.55rem;">Delete Student</button>
         </div>
       `
     )
@@ -386,6 +391,7 @@ document.addEventListener("click", async (event) => {
   const toggleAccessId = event.target.getAttribute("data-toggle-access");
   const approvedState = event.target.getAttribute("data-approved");
   const deleteRoomId = event.target.getAttribute("data-delete-room");
+  const deleteStudentId = event.target.getAttribute("data-delete-student");
   const resolveId = event.target.getAttribute("data-resolve");
   const deleteNoticeId = event.target.getAttribute("data-delete-notice");
 
@@ -429,6 +435,22 @@ document.addEventListener("click", async (event) => {
       if (isDemoMode()) demoMutations.vacateStudent(vacateId);
       else await apiFetch(`/students/${vacateId}/vacate`, { method: "PUT" });
       showToast("Student vacated successfully.");
+      await loadAllData();
+    }
+
+    if (deleteStudentId) {
+      const target = adminState.students.find((student) => student._id === deleteStudentId);
+      if (!target) return;
+      const confirmed = window.confirm(
+        `Delete ${target.name}? This will also remove linked login, fees, and complaints records.`
+      );
+      if (!confirmed) return;
+      if (isDemoMode()) {
+        showToast("Delete is only available with live backend.", "error");
+        return;
+      }
+      await apiFetch(`/students/${deleteStudentId}`, { method: "DELETE" });
+      showToast("Student deleted successfully.");
       await loadAllData();
     }
 

@@ -5,6 +5,7 @@ const {
   createStudent,
   updateStudent,
   vacateStudent,
+  deleteStudent,
   updateStudentAccess
 } = require("../controllers/studentController");
 const { protect } = require("../middleware/authMiddleware");
@@ -28,6 +29,7 @@ router.post(
 );
 router.put("/:id", protect, isWarden, updateStudent);
 router.put("/:id/vacate", protect, isWarden, vacateStudent);
+router.delete("/:id", protect, isWarden, deleteStudent);
 router.put(
   "/:id/access",
   protect,
