@@ -969,6 +969,28 @@ th {
     grid-template-columns: 1fr;
   }
 
+  .auth-shell {
+    min-height: auto;
+    align-items: stretch;
+    align-content: start;
+    gap: 1.25rem;
+    padding-top: 1.25rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .dashboard-layout,
+  .student-layout {
+    min-height: auto;
+  }
+
+  .sidebar {
+    justify-content: flex-start;
+  }
+
+  .sidebar-actions {
+    margin-top: 1rem;
+  }
+
   .auth-card {
     width: 100%;
     justify-self: stretch;
@@ -997,11 +1019,44 @@ th {
 }
 
 @media (max-width: 720px) {
+  body {
+    font-size: 16px;
+  }
+
   .landing-shell,
   .auth-shell,
   .allocation-shell,
   .dashboard-main {
     padding: 1.2rem;
+  }
+
+  .auth-copy h1 {
+    font-size: clamp(2rem, 9vw, 2.8rem);
+    line-height: 1.08;
+    margin-bottom: 0.65rem;
+  }
+
+  .auth-copy p,
+  .helper-note {
+    font-size: 0.98rem;
+    line-height: 1.6;
+  }
+
+  .stack-form label,
+  .grid-form label {
+    font-size: 1rem;
+  }
+
+  .stack-form input,
+  .grid-form input,
+  .grid-form select,
+  .grid-form textarea,
+  .btn {
+    font-size: 1rem;
+  }
+
+  .nav-link {
+    font-size: 1rem;
   }
 
   .landing-hero,
@@ -1037,6 +1092,19 @@ th {
 
   .auth-card {
     padding: 1.3rem;
+  }
+
+  .dashboard-main {
+    padding-top: 1rem;
+  }
+
+  .page-topbar h1,
+  .allocation-topbar h1 {
+    font-size: clamp(1.85rem, 8vw, 2.3rem);
+  }
+
+  .eyebrow {
+    font-size: 0.78rem;
   }
 
   .signup-section {
@@ -1093,5 +1161,27 @@ th {
     text-transform: uppercase;
     color: var(--muted);
     font-weight: 800;
+  }
+}
+
+@media (max-width: 420px) {
+  .auth-shell,
+  .dashboard-main,
+  .allocation-shell,
+  .landing-shell {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .auth-card {
+    padding: 1rem;
+  }
+
+  .btn {
+    padding: 0.82rem 1rem;
+  }
+
+  .nav-link {
+    padding: 0.8rem 0.85rem;
   }
 }
