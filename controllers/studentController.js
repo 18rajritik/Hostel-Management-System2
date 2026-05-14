@@ -54,6 +54,7 @@ const createStudent = async (req, res, next) => {
       name: req.body.name,
       email: req.body.email,
       phone: req.body.phone,
+      age: req.body.age ?? null,
       course: req.body.course,
       year: req.body.year,
       address: req.body.address,
@@ -98,7 +99,7 @@ const updateStudent = async (req, res, next) => {
       }
     }
 
-    const allowedFields = ["name", "email", "phone", "course", "year", "address", "status"];
+    const allowedFields = ["name", "email", "phone", "age", "course", "year", "address", "status"];
     allowedFields.forEach((field) => {
       if (req.body[field] !== undefined) student[field] = req.body[field];
     });

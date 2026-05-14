@@ -30,6 +30,7 @@ document.getElementById("student-logout").addEventListener("click", () => {
 
 const renderProfile = () => {
   const profile = studentState.profile;
+  const roommates = profile.roommates || [];
   document.getElementById("student-name").textContent = profile.name;
   document.getElementById("student-email").textContent = profile.email;
   document.getElementById("student-avatar").textContent = initials(profile.name);
@@ -74,6 +75,33 @@ const renderProfile = () => {
       <p><strong>Amenities:</strong> ${
         profile.room_id.amenities?.length ? profile.room_id.amenities.join(", ") : "Not listed"
       }</p>
+      <div class="roommates-wrap">
+        <h3>Roommates</h3>
+        ${
+          roommates.length
+            ? `
+              <div class="roommates-grid">
+                ${roommates
+                  .map(
+                    (roommate) => `
+                      <article class="roommate-card">
+                        <h4>${roommate.name}</h4>
+                        <div class="profile-meta">
+                          <div><strong>Course</strong>${roommate.course || "—"}</div>
+                          <div><strong>Year</strong>${roommate.year || "—"}</div>
+                          <div><strong>Age</strong>${roommate.age || "—"}</div>
+                          <div><strong>Phone</strong>${roommate.phone || "—"}</div>
+                          <div><strong>Email</strong>${roommate.email || "—"}</div>
+                        </div>
+                      </article>
+                    `
+                  )
+                  .join("")}
+              </div>
+            `
+            : "<p>No roommates assigned yet.</p>"
+        }
+      </div>
     `
     : `<p>No room assigned yet.</p>`;
 };

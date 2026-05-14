@@ -20,7 +20,8 @@ router.post(
   isWarden,
   [
     body("name").trim().notEmpty().withMessage("Name is required"),
-    body("email").isEmail().withMessage("Valid email is required")
+    body("email").isEmail().withMessage("Valid email is required"),
+    body("age").optional({ values: "falsy" }).isInt({ min: 1, max: 120 }).withMessage("Age must be between 1 and 120")
   ],
   validate,
   createStudent

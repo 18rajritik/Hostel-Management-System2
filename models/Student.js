@@ -19,6 +19,12 @@ const studentSchema = new mongoose.Schema(
       trim: true,
       default: ""
     },
+    age: {
+      type: Number,
+      min: 1,
+      max: 120,
+      default: null
+    },
     course: {
       type: String,
       trim: true,

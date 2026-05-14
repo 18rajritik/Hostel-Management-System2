@@ -822,6 +822,33 @@ th {
   color: var(--muted);
 }
 
+.roommates-wrap {
+  margin-top: 1.3rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(25, 36, 44, 0.08);
+}
+
+.roommates-wrap h3 {
+  margin: 0 0 0.9rem;
+}
+
+.roommates-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.roommate-card {
+  border-radius: var(--radius-md);
+  background: #fff;
+  border: 1px solid rgba(25, 36, 44, 0.08);
+  padding: 1rem;
+}
+
+.roommate-card h4 {
+  margin: 0 0 0.65rem;
+}
+
 .allocation-body {
   min-height: 100vh;
   background:

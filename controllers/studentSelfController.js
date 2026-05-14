@@ -15,7 +15,24 @@ const getStudentProfile = async (req, res, next) => {
       throw new Error("Student profile not found.");
     }
 
-    res.json({ success: true, data: student });
+    let roommates = [];
+    if (student.room_id?._id) {
+      roommates = await Student.find({
+        room_id: student.room_id._id,
+        _id: { $ne: student._id }
+      })
+        .select("name email phone age course year")
+        .sort({ name: 1 })
+        .lean();
+    }
+
+    res.json({
+      success: true,
+      data: {
+        ...student,
+        roommates
+      }
+    });
   } catch (error) {
     next(error);
   }
