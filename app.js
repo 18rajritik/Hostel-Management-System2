@@ -43,6 +43,10 @@ app.get("/api/health", (req, res) => {
   res.json({ success: true, message: "Server is running", timestamp: new Date() });
 });
 
+app.get("/health", (req, res) => {
+  res.json({ success: true, message: "Server is running", timestamp: new Date() });
+});
+
 app.use(notFound);
 app.use(errorHandler);
 
