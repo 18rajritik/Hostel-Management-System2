@@ -13,6 +13,12 @@ const getRoomFilterStatus = (room) => {
   return "available";
 };
 
+const getRoomStatusIcon = (status) => {
+  if (status === "available") return "&#10004;";
+  if (status === "partial") return "&#9888;";
+  return "&#10008;";
+};
+
 const renderAllocation = () => {
   const studentWrap = document.getElementById("unallocated-students");
   const roomWrap = document.getElementById("available-rooms");
@@ -28,7 +34,7 @@ const renderAllocation = () => {
           (student) => `
             <button class="selection-card ${allocationState.selectedStudentId === student._id ? "selected" : ""}" data-student-card="${student._id}">
               <h3>${student.name}</h3>
-              <p>${student.course || "Course not set"} • ${student.year || "Year not set"}</p>
+              <p>${student.course || "Course not set"} &bull; ${student.year || "Year not set"}</p>
               <p>${student.email}</p>
             </button>
           `
@@ -40,11 +46,12 @@ const renderAllocation = () => {
     ? filteredRooms
         .map((room) => {
           const roomStatus = getRoomFilterStatus(room);
+          const statusIcon = getRoomStatusIcon(roomStatus);
           return `
             <button class="selection-card ${roomStatus === "occupied" ? "room-full" : "room-available"}" data-room-card="${room._id}">
               <h4>Room ${room.room_number}</h4>
-              <p>${room.block} Block • Floor ${room.floor}</p>
-              <p>${room.type} • ${room.occupied}/${room.capacity} occupied • ${roomStatus}</p>
+              <p>${room.block} Block &bull; Floor ${room.floor}</p>
+              <p>${room.type} &bull; ${room.occupied}/${room.capacity} occupied &bull; ${statusIcon} ${roomStatus}</p>
             </button>
           `;
         })
