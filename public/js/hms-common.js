@@ -405,7 +405,7 @@ const apiFetch = async (path, options = {}) => {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.message || "Something went wrong.");
+    throw new Error(data.message || `Request failed (${response.status}).`);
   }
 
   return data;

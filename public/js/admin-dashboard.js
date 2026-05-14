@@ -89,17 +89,19 @@ const renderStudents = () => {
             </span>
           </td>
           <td data-label="Action">
-            <button class="table-action ${student.accessApproved ? "danger" : ""}" data-toggle-access="${student._id}" data-approved="${student.accessApproved ? "true" : "false"}">
-              ${student.accessApproved ? "Revoke Access" : "Approve Access"}
-            </button>
-            <button class="table-action ${student.room_id ? "danger" : ""}" ${
-              student.room_id ? `data-vacate="${student._id}"` : "disabled"
-            }>
-              Vacate
-            </button>
-            <button class="table-action danger" ${canDelete ? `data-delete-student="${student._id}"` : "disabled"}>
-              Delete
-            </button>
+            <div class="table-actions">
+              <button class="table-action ${student.accessApproved ? "danger" : ""}" data-toggle-access="${student._id}" data-approved="${student.accessApproved ? "true" : "false"}">
+                ${student.accessApproved ? "Revoke Access" : "Approve Access"}
+              </button>
+              <button class="table-action ${student.room_id ? "danger" : ""}" ${
+                student.room_id ? `data-vacate="${student._id}"` : "disabled"
+              }>
+                Vacate
+              </button>
+              <button class="table-action danger" ${canDelete ? `data-delete-student="${student._id}"` : "disabled"}>
+                Delete
+              </button>
+            </div>
           </td>
         </tr>
       `;
@@ -386,14 +388,19 @@ document.getElementById("generate-default-rooms-button")?.addEventListener("clic
 });
 
 document.addEventListener("click", async (event) => {
-  const vacateId = event.target.getAttribute("data-vacate");
-  const quickApproveId = event.target.getAttribute("data-approve-access");
-  const toggleAccessId = event.target.getAttribute("data-toggle-access");
-  const approvedState = event.target.getAttribute("data-approved");
-  const deleteRoomId = event.target.getAttribute("data-delete-room");
-  const deleteStudentId = event.target.getAttribute("data-delete-student");
-  const resolveId = event.target.getAttribute("data-resolve");
-  const deleteNoticeId = event.target.getAttribute("data-delete-notice");
+  const actionTarget = event.target.closest(
+    "[data-vacate], [data-approve-access], [data-toggle-access], [data-delete-room], [data-delete-student], [data-resolve], [data-delete-notice]"
+  );
+  if (!actionTarget) return;
+
+  const vacateId = actionTarget.getAttribute("data-vacate");
+  const quickApproveId = actionTarget.getAttribute("data-approve-access");
+  const toggleAccessId = actionTarget.getAttribute("data-toggle-access");
+  const approvedState = actionTarget.getAttribute("data-approved");
+  const deleteRoomId = actionTarget.getAttribute("data-delete-room");
+  const deleteStudentId = actionTarget.getAttribute("data-delete-student");
+  const resolveId = actionTarget.getAttribute("data-resolve");
+  const deleteNoticeId = actionTarget.getAttribute("data-delete-notice");
 
   try {
     if (toggleAccessId) {
