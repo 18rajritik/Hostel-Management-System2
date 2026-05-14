@@ -19,7 +19,7 @@ const serializeUser = (user) => ({
 
 const register = async (req, res, next) => {
   try {
-    const { username, name, email, password } = req.body;
+    const { username, name, email, phone, password } = req.body;
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -32,8 +32,12 @@ const register = async (req, res, next) => {
       student = await Student.create({
         name: name || username || email.split("@")[0],
         email,
+        phone,
         status: "pending"
       });
+    } else if (!student.phone && phone) {
+      student.phone = phone;
+      await student.save();
     }
 
     const user = new User({

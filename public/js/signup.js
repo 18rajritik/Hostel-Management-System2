@@ -34,6 +34,7 @@ document.getElementById("signup-form").addEventListener("submit", async (event) 
       body: JSON.stringify({
         name: payload.name,
         email: payload.email,
+        phone: payload.phone,
         username: payload.username,
         password: payload.password
       })
